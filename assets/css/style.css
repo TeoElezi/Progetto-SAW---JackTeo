@@ -1,1 +1,137 @@
 
+/* style.css */
+/* --- Font & colore di base --- */
+
+@font-face {
+    font-family: 'f1-font';
+    src: url('../fonts/Formula1-Bold.otf') format('opentype'); /* Correct format for .otf files */
+}
+    
+body {
+    font-family: 'f1-font', sans-serif; /* Fallback to sans-serif if the custom font fails to load */
+    background-color: #f8f9fa; /* Light grey background */
+    color: #212529; /* Dark grey text color */
+    position: relative; /* Establish a containing block for pseudo-elements */  
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;  
+}
+main{
+    flex: 1;
+}
+
+body::before {
+    
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("../images/bg-image.jpg"); /* Adjusted path to match typical folder structure */
+    background-size: cover; /* Ensure the background image covers the entire viewport */
+    background-repeat: no-repeat; /* Prevent the background image from repeating */
+    background-attachment: fixed; /* Make the background image fixed during scrolling */
+    filter: blur(8px); /* Apply blur effect to the background image */
+    z-index: -1; /* Place the pseudo-element behind the content */
+}
+
+/* --- Titoli customizzati --- */
+h1, h2, h3 {
+    font-weight: 700;
+    color: #E10600; /* Rosso acceso stile F1 */
+    text-transform: uppercase;
+}
+
+h2 {
+    border-bottom: 2px solid #E10600;
+    padding-bottom: 0.3rem;
+    margin-bottom: 1.5rem;
+}
+
+/* --- Navbar personalizzata --- */
+.header-container a{ 
+    color: white;
+    font-weight: 500;
+    transition: color 0.3s ease, transform 0.5s ease-in-out, text-shadow 0.2s ease-in-out;
+}
+.header-container a:hover {
+    color: #E10600 !important;
+    text-decoration: underline;
+    transform: scale(1.05);
+    text-shadow: 0 0 1px #E10600, 0 0 2px #E10600;
+}
+
+.header-container a img {
+    transition: transform 0.2s ease-in-out;
+}
+
+.header-container a img:hover {
+    transform: scale(1.1);
+}
+#navbarContent form input:hover {
+    color: #E10600 !important;
+    box-shadow: 0 0 5px #E10600, 0 0 10px #E10600, 0 0 15px #E10600;
+    transition: box-shadow 0.2s ease-in-out;
+}
+
+/* Barra rossa ticker */
+.bg-danger {
+    background-color: #E10600 !important;
+}
+
+/* Logo */
+img[alt="F1 FanHub"] {
+    filter: brightness(0) invert(1); /* Logo bianco */
+}
+
+
+/* --- Card Notizie --- */
+.card {
+    transition: transform 0.2s ease-in-out;
+    border: none;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border-bottom: 10PX;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    
+    box-shadow: inset 2px -2px 2px #E10600;
+    border-top: 3px;
+    border-right: 3px;
+}
+
+
+
+/* --- Countdown --- */
+#countdown {
+    font-size: 1.2rem;
+    font-weight: bold;
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+    padding: 0.8rem;
+    border-radius: 5px;
+}
+
+/* --- Lista Classifica --- */
+.list-group-item {
+    font-weight: 500;
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+}
+
+.list-group-item .badge {
+    font-size: 1rem;
+}
+
+/* --- Footer --- */
+footer {
+    background-color: #212529;
+    color: #ffffff;
+    font-size: 0.9rem;
+}
+footer a:hover {
+    color: #E10600 !important;
+    text-decoration: underline;
+}
