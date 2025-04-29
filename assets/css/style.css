@@ -1,1 +1,81 @@
 
+/* style.css */
+
+/* --- Font & colore di base --- */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+    color: #212529;
+}
+
+/* --- Titoli customizzati --- */
+h1, h2, h3 {
+    font-weight: 700;
+    color: #c30000; /* Rosso acceso stile F1 */
+    text-transform: uppercase;
+}
+
+h2 {
+    border-bottom: 2px solid #c30000;
+    padding-bottom: 0.3rem;
+    margin-bottom: 1.5rem;
+}
+
+/* --- Navbar personalizzata --- */
+.navbar {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+    color: #ffffff;
+}
+
+.navbar-nav .nav-link {
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #c30000;
+}
+
+/* --- Card Notizie --- */
+.card {
+    transition: transform 0.2s ease;
+    border: none;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+/* --- Countdown --- */
+#countdown {
+    font-size: 1.2rem;
+    font-weight: bold;
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+    padding: 0.8rem;
+    border-radius: 5px;
+}
+
+/* --- Lista Classifica --- */
+.list-group-item {
+    font-weight: 500;
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+}
+
+.list-group-item .badge {
+    font-size: 1rem;
+}
+
+/* --- Footer --- */
+footer {
+    background-color: #212529;
+    color: #ffffff;
+    font-size: 0.9rem;
+}
