@@ -21,7 +21,6 @@ main{
 }
 
 body::before {
-    
     content: "";
     position: fixed;
     top: 0;
@@ -50,16 +49,37 @@ h2 {
 }
 
 /* --- Navbar personalizzata --- */
-.header-container a{ 
+nav ul li a{ 
     color: white;
     font-weight: 500;
-    transition: color 0.3s ease, transform 0.5s ease-in-out, text-shadow 0.2s ease-in-out;
+    transition: color 0.3s ease, transform 0.51s ease-in-out, text-shadow 0.2s ease-in-out;
 }
-.header-container a:hover {
+nav ul li a:hover {
     color: #E10600 !important;
     text-decoration: underline;
     transform: scale(1.05);
     text-shadow: 0 0 1px #E10600, 0 0 2px #E10600;
+}
+.navbar-brand{
+    nav ul li a{ 
+        color: white;
+        font-weight: 500;
+        transition: color 0.3s ease, transform 0.51s ease-in-out, text-shadow 0.2s ease-in-out;
+    }
+}
+
+.navbar-brand:hover {
+    color: #E10600 !important;
+    text-decoration: underline;
+    transform: scale(1.05);
+    text-shadow: 0 0 1px #E10600, 0 0 2px #E10600;
+}
+
+
+#navbarContent form input:hover {
+    color: #E10600 !important;
+    box-shadow: 0 0 5px #E10600, 0 0 10px #E10600, 0 0 15px #E10600;
+    transition: box-shadow 0.2s ease-in-out;
 }
 
 .header-container a img {
@@ -68,11 +88,6 @@ h2 {
 
 .header-container a img:hover {
     transform: scale(1.1);
-}
-#navbarContent form input:hover {
-    color: #E10600 !important;
-    box-shadow: 0 0 5px #E10600, 0 0 10px #E10600, 0 0 15px #E10600;
-    transition: box-shadow 0.2s ease-in-out;
 }
 
 /* Barra rossa ticker */

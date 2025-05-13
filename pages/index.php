@@ -17,7 +17,7 @@ require_once '../config/config.php';
     <p>
     Il nostro obiettivo è creare un punto di riferimento per i fan, con contenuti aggiornati, curiosità, statistiche e una community in continua crescita.  
     </p>
-    <a href="chi-siamo.php" class="btn btn-outline-black mt-3">Scopri chi siamo</a>
+    <button class="btn btn-outline-dark" href="404.php">Scopri chi siamo</button>
   </div>
   </div>
 

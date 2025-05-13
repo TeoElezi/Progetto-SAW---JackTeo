@@ -30,21 +30,20 @@ require_once __DIR__ . '/../config/config.php';
                 <span class="fw-bold">FanHub - StartSaw</span>
             </a>
 
-            <!-- Pulsante Hamburger -->
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
-                aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+            aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
+            
 
             <!-- Contenuto navbar -->
-            <div class="collapse navbar-collapse justify-content-between align-items-center" id="navbarContent">
-                <!-- Link -->
-                <ul class="navbar-nav mx-auto mb-2 mb-lg-0 d-flex gap-lg-3 text-center">
-                    <li class="nav-item"><a class="nav-link" href="../pages/news.php">Notizie</a></li>
+            <div class="collapse navbar-collapse" id="navbarContent">                <!-- Link -->
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="../pages/404.php">Notizie</a></li>
                     <li class="nav-item"><a class="nav-link" href="../pages/races.php">Gare</a></li>
                     <li class="nav-item"><a class="nav-link" href="../pages/drivers.php">Piloti</a></li>
-                    <li class="nav-item"><a class="nav-link" href="../pages/teams.php">Team</a></li>
-                    <li class="nav-item"><a class="nav-link" href="../pages/standings.php">Classifiche</a></li>
+                    <li class="nav-item"><a class="nav-link" href="../pages/404.php">Team</a></li>
+                    <li class="nav-item"><a class="nav-link" href="../pages/404.php">Classifiche</a></li>
                 </ul>
 
                 <!-- Search -->
@@ -52,6 +51,16 @@ require_once __DIR__ . '/../config/config.php';
                     <input class="form-control me-2" type="search" name="q" placeholder="Cerca..." aria-label="Cerca" required>
                     <button class="btn btn-outline-light" type="submit">Cerca</button>
                 </form>
+                <?php if (!isset($_SESSION["logged_in"])): ?>
+                <a href="../user/login.php" class="text-decoration-none text-center d-block">
+                    <img src="../assets/images/user.png" alt="Accedi" class="rounded-circle" style="width: 70px; height: 70px;">
+                    <small class="d-block text-light">Accedi</small>
+                </a>
+                <?php else: ?>
+                    <a href="../user/profilePage.php" class="btn btn-outline-light">Profilo</a>
+                    <a href="../user/logout.php" class="btn btn-danger text-dark">Logout</a>
+                <?php endif; ?>
+
             </div>
         </nav>
     </div>
@@ -62,7 +71,6 @@ require_once __DIR__ . '/../config/config.php';
         <div class="container py-1 d-flex justify-content-center align-items-center">
             <?php
             // Esegui la query per ottenere il prossimo GP
-            require_once __DIR__ .'/../config/config.php';
             $query = "SELECT name, date, location FROM races WHERE date > NOW() ORDER BY date ASC LIMIT 1";
             $result = mysqli_query($conn, $query);
             while ($row = mysqli_fetch_assoc($result)) {

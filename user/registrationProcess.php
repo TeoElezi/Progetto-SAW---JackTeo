@@ -1,22 +1,5 @@
 <?php
-
-    $DBHost = "127.0.0.1";
-    $DBusername = "Amministratore";
-    $DBpassword = "Giacomo.3544";
-    $DBdatabase = "f1database";
-
-        
-    // Connessione al database
-    $connect = mysqli_connect($DBHost, $DBusername, $DBpassword, $DBdatabase);
-
-    // Verifica della connessione
-    if ($connect === false) {
-        die("Connessione al database fallita: " . mysqli_connect_error());
-    }
-    
-    echo "Connessione al database riuscita";
-
-
+    require_once '../config/config.php';
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // 1. Prendo i dati GREZZI
         $nome = trim($_POST["name"]);
@@ -25,7 +8,7 @@
         $password = trim($_POST["password"]);
         $confermaPW = trim($_POST["confirm"]);
     
-         // DEBUG
+        // DEBUG
         echo "Password: " . $password . "<br>";
         echo "ConfermaPW: " . $confermaPW . "<br>";
 
@@ -33,40 +16,31 @@
             echo "<script>alert('Le password non coincidono'); window.history.back();</script>";
             exit;
         } else {
-            echo "Password ok! $newsletter";
-            // Ora puoi procedere al salvataggio
+            echo "Password ok!";
         }
     
         // 4. SOLO ORA proteggi per il database
-        $nome = $connect->real_escape_string($nome);
-        $cognome = $connect->real_escape_string($cognome);
-        $email = $connect->real_escape_string($email);
-        $password = $connect->real_escape_string($password);
+        $nome = $conn->real_escape_string($nome);
+        $cognome = $conn->real_escape_string($cognome);
+        $email = $conn->real_escape_string($email);
+        $password = $conn->real_escape_string($password);
 
         if (!preg_match("/^[a-zA-ZÀ-ÿ\s]+$/u", $nome)) {
             echo "Il nome può contenere solo lettere.";
             exit;
         }
         
-        if (!preg_match("/^[a-zA-ZÀ-ÿ\s]+$/u", $cognome)) {
-            echo "Il cognome può contenere solo lettere.";
-            exit;
-        }
-        if (!preg_match("/^(?=.*[A-Za-z])(?=.*\d)(?=.*[.!?_@#])[A-Za-z\d.!?_@#]{8,}$/", $password)) {
-            echo "La password deve contenere almeno una lettera, un numero, un simbolo (.!?_@#) ed essere lunga almeno 8 caratteri.";
-            exit;
-        }
-        
-
         // Gestione delle password 
         $hashPassword = password_hash($password, PASSWORD_DEFAULT);
     
-        $newsletter = isset($_POST["newsletter"]) ? 1 : 0;
+        // Inizializza la variabile newsletter (0 se non selezionato, 1 se selezionato)
+        $newsletter = isset($_POST['newsletter']) ? 1 : 0;
 
-
-        $sql = "INSERT INTO utenti (Nome, Cognome, Email, Pw, Newsletter) VALUES ('$nome', '$cognome', '$email', '$hashPassword', '$newsletter')";
+        // Correzione della sintassi SQL (rimuovere le virgolette attorno ai nomi delle colonne)
+        $sql = "INSERT INTO users (name, surname, email, password_hash, newsletter) 
+                VALUES ('$nome', '$cognome', '$email', '$hashPassword', '$newsletter')";
     
-        if ($connect -> query($sql) === true){
+        if ($conn -> query($sql) === true){
              echo "Record inserito con successo";
             session_start();  
             $_SESSION['logged_in'] = true;
@@ -74,15 +48,10 @@
             $_SESSION['nome'] = $nome;
             $_SESSION['cognome'] = $cognome;
             $_SESSION['newsletter'] = $newsletter;
-            header("Location: ../index.php");
+            header("Location: ../pages/index.php");
         }
-        else echo "Errore durante l'inserimento del record: " . mysqli_error($connect);
+        else echo "Errore durante l'inserimento del record: " . mysqli_error($conn);
 
-
-        mysqli_close($connect);
-
+        mysqli_close($conn);
     }
-
-
-
 ?>
