@@ -3,7 +3,7 @@
 </main> <!-- chiusura container -->
 
 <!-- Footer -->
-<footer class="bg-black text-center text-light mt-5 pt-5 pb-3">
+<footer class="bg-dark text-center text-light pt-5 pb-3">
     <div class="container">
         <div class="row">
             <!-- Sezione Link Footer -->

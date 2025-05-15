@@ -102,19 +102,41 @@ require_once '../config/config.php';
 
 
   <!-- Sezione Prossimo GP -->
-  <div class="row">
+  <div class="race-box text-white bg-dark p-3" style="border-radius: 15px; margin-left: auto; margin-right: auto; margin-bottom: 40px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); position: relative;">
   <?php
-    require_once __DIR__ .'/../config/config.php';
-    $query = "SELECT name, date, location FROM races WHERE date > NOW() ORDER BY date ASC LIMIT 1";
-    $result = mysqli_query($conn, $query);
-    while ($row = mysqli_fetch_assoc($result)) {
+  $query = "SELECT name, date, location, circuit_img FROM races WHERE date > NOW() ORDER BY date ASC LIMIT 1";
+  $result = mysqli_query($conn, $query);
+  while ($row = mysqli_fetch_assoc($result)) {
   ?>
-    <div class="col-md-6">
-    <h2>Prossimo Gran Premio</h2>
-    <p><strong><?php echo $row['name'] . ' - ' . date('d M Y', strtotime($row['date'])); ?></strong></p>
-    <div class="alert alert-info" id="countdown">Caricamento countdown...</div>
+    
+  <h2 class="mb-4">Prossimo gran premio</h2>
+    <!-- Data in alto a destra -->
+    <div style="position: absolute; top: 10px; right: 10px; background-color: #444; padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 1.2rem;">
+      <?php echo date('d M', strtotime($row['date'])); ?>
     </div>
+
+    <!-- Immagine del circuito centrata -->
+    <div class="text-center">
+      <img src="<?php echo $row['circuit_img']; ?>" alt="Circuit" class="img-fluid" style="max-height: 300px; object-fit: contain;">
+    </div>
+
+    <!-- Info GP -->
+    <div class="p-2 px-0">
+      <p class="mb-2" style="font-weight: bold; font-size: 2.6rem;">
+        <span style="color: #ccc;"><?php echo $row['name']; ?></span>
+      </p>
+      <p class="mb-1" style="color: red; font-weight: bold; font-size: 1.6rem">
+        <?php echo $row['location']; ?>
+      </p>
+      <div style="font-size: 1.2rem" id="countdown">Caricamento countdown...</div>
+    </div>
+
   <?php } ?>
+</div>
+
+
+
+
 
   <div class="row">
     <!-- Classifica Piloti -->
