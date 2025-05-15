@@ -2,6 +2,11 @@
 require_once __DIR__ . '/../config/config.php';
 ?>
 
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+?>
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -25,7 +30,7 @@ require_once __DIR__ . '/../config/config.php';
     <div class="header-container container py-3">
         <nav class="navbar navbar-expand-lg navbar-dark w-100">
             <!-- Logo e titolo -->
-            <a class="navbar-brand d-flex align-items-center" href="../pages/index.php">
+            <a class="navbar-brand" href="../pages/index.php">
                 <img src="../assets/images/f1_logo_white.png" alt="F1 FanHub" width="150" class="me-2">
                 <span class="fw-bold">FanHub - StartSaw</span>
             </a>
@@ -51,14 +56,18 @@ require_once __DIR__ . '/../config/config.php';
                     <input class="form-control me-2" type="search" name="q" placeholder="Cerca..." aria-label="Cerca" required>
                     <button class="btn btn-outline-light" type="submit">Cerca</button>
                 </form>
-                <?php if (!isset($_SESSION["logged_in"])): ?>
-                <a href="../user/login.php" class="text-decoration-none text-center d-block">
-                    <img src="../assets/images/user.png" alt="Accedi" class="rounded-circle" style="width: 70px; height: 70px;">
-                    <small class="d-block text-light">Accedi</small>
-                </a>
+                <!-- Accesso / Profilo -->
+                <?php if (!isset($_SESSION["logged_in"]) || $_SESSION["logged_in"] !== true): ?>
+                    <a href="../user/login.php" class="text-decoration-none text-center d-block ms-3">
+                        <img src="../assets/images/user.png" alt="Accedi" class="rounded-circle" style="width: 70px; height: 70px;">
+                        <small class="d-block text-light">Accedi</small>
+                    </a>
                 <?php else: ?>
-                    <a href="../user/profilePage.php" class="btn btn-outline-light">Profilo</a>
-                    <a href="../user/logout.php" class="btn btn-danger text-dark">Logout</a>
+                    <div class="d-flex align-items-center ms-3">
+                        <small class="d-block text-light me-2"><?php echo htmlspecialchars($_SESSION['nome']); ?></small>
+                        <a href="../user/profilePage.php" class="btn btn-outline-light me-2">Profilo</a>
+                        <a href="../user/logout.php" class="btn btn-danger text-dark">Logout</a>
+                    </div>
                 <?php endif; ?>
 
             </div>

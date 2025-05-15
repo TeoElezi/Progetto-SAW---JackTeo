@@ -1,41 +1,42 @@
 <?php
+require_once '../config/config.php';
+session_start();
 
-    require_once '../config/config.php';
-    
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $email = filter_var(trim($_POST['email']), FILTER_SANITIZE_EMAIL);
+    $password = trim($_POST['password']);
 
+    // Prepared statement
+    $stmt = $conn->prepare("SELECT name, surname, email, password_hash, newsletter FROM users WHERE Email = ?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
 
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        // Prendi i dati dal form
-        $email = trim($_POST['email']);
-        $password = trim($_POST['password']);
+    $result = $stmt->get_result();
 
-        $email = $conn->real_escape_string($email);
-    
-        // Esegui query per cercare l'utente
-        $query = "SELECT * FROM users WHERE Email = '$email'";
-        $result = $conn->query($query);
-    
-        if ($result && $result->num_rows == 1) {
-            $user = $result->fetch_assoc();
-    
-            // Verifica la password (se è salvata criptata usa password_verify)
-            if (password_verify($password, $user['password_hash'])) {
-                // Login corretto: imposta le variabili di sessione
-                session_start(); 
-                $_SESSION['logged_in'] = true; 
-                $_SESSION['nome'] = $user['Nome'];
-                $_SESSION['cognome'] = $user['Cognome'];
-                $_SESSION['email'] = $user['Email'];
-                $_SESSION['newsletter'] = $user['Newsletter'];
-    
-                header("Location: ../pages/index.php"); // Vai alla home
-                exit();
-            } else {
-                echo "Password errata.";
-            }
+    if ($result && $result->num_rows === 1) {
+        $user = $result->fetch_assoc();
+
+        if (password_verify($password, $user['password_hash'])) {
+            $_SESSION['logged_in'] = true;
+            $_SESSION['nome'] = $user['name'];
+            $_SESSION['cognome'] = $user['surname'];
+            $_SESSION['email'] = $user['email'];
+            $_SESSION['newsletter'] = $user['newsletter'];
+
+            header("Location: ../pages/index.php?success=login_success");
+            $stmt->close();
+            $conn->close();
+            exit();
         } else {
-            echo "Utente non trovato.";
+            header("Location: ../pages/login.php?error=wrong_password");
+            $stmt->close();
+            $conn->close();
+            exit();
         }
+    } else {
+        header("Location: ../pages/login.php?error=user_not_found");
+        $stmt->close();
+        $conn->close();
+        exit();
     }
-
-?>
+}
