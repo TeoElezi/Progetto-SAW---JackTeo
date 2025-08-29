@@ -99,6 +99,20 @@ require_once '../config/config.php';
 </div>
 
 
+  <!-- Sezione Donazioni / Call To Action -->
+  <div class="row mb-5">
+    <div class="col-md-10 mx-auto">
+      <div class="p-4 p-md-5 bg-white border rounded-3 shadow-sm d-flex flex-column flex-md-row align-items-center gap-3">
+        <div class="flex-grow-1">
+          <h2 class="h3 mb-2">Supporta F1 FanHub</h2>
+          <p class="mb-0 text-muted">Aiutaci a sviluppare nuove funzionalità e far crescere la community. Anche una piccola donazione fa la differenza.</p>
+        </div>
+        <div>
+          <a href="../payments/donazioni.php" class="btn btn-danger btn-lg">Dona ora</a>
+        </div>
+      </div>
+    </div>
+  </div>
 
 
   <!-- Sezione Prossimo GP -->
@@ -180,8 +194,6 @@ require_once '../config/config.php';
 <!-- Footer -->
 <?php include '../includes/footer.php' ?>
 
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 
 <!-- Script Countdown -->

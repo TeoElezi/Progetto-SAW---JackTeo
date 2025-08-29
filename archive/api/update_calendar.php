@@ -30,28 +30,27 @@ if ($err) {
     $data = json_decode($response, true);
 
     // Itera sulle date e inserisci i dati nel database
-    foreach ($data as $date => $races) {
+    foreach ($data as $dateKey => $races) {
         foreach ($races as $race) {
-            $name = $race['gPrx'];
-            $date = date('Y-m-d', strtotime($race['startDate']));
-            $location = $race['crct'];
-            $circuit_img = $race['evLink'];
-            $winner = $race['winner'];
+            $name = $race['gPrx'] ?? null;
+            $date = isset($race['startDate']) ? date('Y-m-d', strtotime($race['startDate'])) : null;
+            $location = $race['crct'] ?? null;
+            $circuit_img = $race['evLink'] ?? null;
 
-            // Prepara la query SQL per inserire i dati nella tabella races
+            // winner_id non disponibile: settiamo NULL
+            $winner_id = null;
+
             $stmt = $conn->prepare("INSERT INTO races (name, date, location, circuit_img, winner_id) VALUES (?, ?, ?, ?, ?)");
             $stmt->bind_param("ssssi", $name, $date, $location, $circuit_img, $winner_id);
-            
-            // Esegui la query
             if ($stmt->execute()) {
                 echo "Record inserito con successo per la gara: $name\n";
             } else {
-                echo "Errore nell'inserimento della gara: $name\n";
+                echo "Errore nell'inserimento della gara: $name - " . $conn->error . "\n";
             }
+            $stmt->close();
         }
     }
 }
 
 // Chiudi la connessione al database
 $conn->close();
-?>

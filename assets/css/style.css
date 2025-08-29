@@ -1,22 +1,40 @@
-
 /* style.css */
 /* --- Font & colore di base --- */
 
+:root {
+    --brand-red: #E10600;
+    --text-color: #212529;
+    --bg-body: #f8f9fa;
+    --border-color: #dee2e6;
+    --shadow-md: 0 4px 8px rgba(0,0,0,0.1);
+}
+
 @font-face {
     font-family: 'f1-font';
-    src: url('../fonts/Formula1-Bold.otf') format('opentype'); /* Correct format for .otf files */
+    src: url('../fonts/Formula1-Bold.otf') format('opentype');
 }
-    
+
+/* Scrollbar invisibile per Chrome, Edge, Safari */
+body::-webkit-scrollbar,
+html::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+}
+
 body {
-    font-family: 'f1-font', sans-serif; /* Fallback to sans-serif if the custom font fails to load */
-    background-color: #f8f9fa; /* Light grey background */
-    color: #212529; /* Dark grey text color */
-    position: relative; /* Establish a containing block for pseudo-elements */  
+    /* Scrollbar */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+    /* Base */
+    font-family: 'f1-font', sans-serif;
+    background-color: var(--bg-body);
+    color: var(--text-color);
     min-height: 100vh;
     display: flex;
-    flex-direction: column;  
+    flex-direction: column;
 }
-main{
+
+main {
     flex: 1;
 }
 
@@ -27,87 +45,71 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url("../images/bg-image.jpg"); /* Adjusted path to match typical folder structure */
-    background-size: cover; /* Ensure the background image covers the entire viewport */
-    background-repeat: no-repeat; /* Prevent the background image from repeating */
-    background-attachment: fixed; /* Make the background image fixed during scrolling */
-    filter: blur(8px); /* Apply blur effect to the background image */
-    z-index: -1; /* Place the pseudo-element behind the content */
+    background-image: url("../images/bg-image.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    filter: blur(8px);
+    z-index: -1;
 }
 
 /* --- Titoli customizzati --- */
 h1, h2, h3 {
     font-weight: 700;
-    color: #E10600; /* Rosso acceso stile F1 */
+    color: var(--brand-red);
     text-transform: uppercase;
 }
 
 h2 {
-    border-bottom: 2px solid #E10600;
+    border-bottom: 2px solid var(--brand-red);
     padding-bottom: 0.3rem;
     margin-bottom: 1.5rem;
 }
 
 /* --- Navbar personalizzata --- */
-.nav-link{ 
+.nav-link,
+.navbar-brand {
     color: white;
     font-weight: 500;
     transition: color 0.4s ease, transform 0.3s ease-in-out, text-shadow 0.2s ease-in-out;
 }
-.nav-link:hover {
-    color: #E10600 !important;
-    text-decoration: underline;
-    transform: scale(1.05);
-    text-shadow: 0 0 1px #E10600, 0 0 2px #E10600;
-}
-.navbar-brand{ 
-    color: white;
-    font-weight: 500;
-    transition: color 0.6s ease, transform 0.3s ease-in-out, text-shadow 0.2s ease-in-out;
-}
 
+.nav-link:hover,
 .navbar-brand:hover {
-    color: #E10600 !important;
+    color: var(--brand-red) !important;
     text-decoration: underline;
     transform: scale(1.05);
-    text-shadow: 0 0 1px #E10600, 0 0 2px #E10600;
+    text-shadow: 0 0 1px var(--brand-red), 0 0 2px var(--brand-red);
 }
-
 
 #navbarContent form input:hover {
-    color: #E10600 !important;
-    box-shadow: 0 0 5px #E10600, 0 0 10px #E10600, 0 0 15px #E10600;
+    color: var(--brand-red) !important;
+    box-shadow: 0 0 5px var(--brand-red), 0 0 10px var(--brand-red), 0 0 15px var(--brand-red);
     transition: box-shadow 0.2s ease-in-out;
 }
 
-
 /* Barra rossa ticker */
 .bg-danger {
-    background-color: #E10600 !important;
+    background-color: var(--brand-red) !important;
 }
 
 /* Logo */
 img[alt="F1 FanHub"] {
-    filter: brightness(0) invert(1); /* Logo bianco */
+    filter: brightness(0) invert(1);
 }
-
 
 /* --- Card Notizie --- */
 .card {
     transition: transform 0.2s ease-in-out;
     border: none;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    border-bottom: 10PX;
+    box-shadow: var(--shadow-md);
+    will-change: transform;
 }
 
 .card:hover {
     transform: translateY(-5px);
-    box-shadow: inset 2px -2px 2px #E10600;
-    border-top: 3px;
-    border-right: 3px;
+    box-shadow: inset 2px -2px 2px var(--brand-red);
 }
-
-
 
 /* --- Countdown --- */
 #countdown {
@@ -119,8 +121,8 @@ img[alt="F1 FanHub"] {
 /* --- Lista Classifica --- */
 .list-group-item {
     font-weight: 500;
-    background-color: #ffffff;
-    border: 1px solid #dee2e6;
+    background-color: #fff;
+    border: 1px solid var(--border-color);
 }
 
 .list-group-item .badge {
@@ -130,10 +132,134 @@ img[alt="F1 FanHub"] {
 /* --- Footer --- */
 footer {
     background-color: #212529;
-    color: #ffffff;
+    color: #fff;
     font-size: 0.9rem;
 }
+
 footer a:hover {
-    color: #E10600 !important;
+    color: var(--brand-red) !important;
     text-decoration: underline;
 }
+
+/* --- Enhancements conservativi (non invasivi) --- */
+/* Mantiene le animazioni esistenti ma migliora performance e accessibilità */
+
+@media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+    .card:hover { transform: none !important; }
+}
+
+/* Stili ricorrenti (non invasivi) */
+.race-box {
+    border-radius: 15px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 40px;
+    box-shadow: var(--shadow-md);
+    position: relative;
+}
+
+.race-box img {
+    max-height: 300px;
+    object-fit: contain;
+}
+
+/* Tabelle leggibili senza toccare le pagine */
+table th, table td { text-align: center; }
+
+/* --- User Dropdown Menu --- */
+.dropdown-menu {
+    border: none;
+    box-shadow: var(--shadow-md);
+    border-radius: 10px;
+    padding: 0.5rem 0;
+    min-width: 200px;
+}
+
+.dropdown-item {
+    padding: 0.75rem 1.5rem;
+    color: var(--text-color);
+    transition: all 0.2s ease-in-out;
+    border: none;
+    background: transparent;
+}
+
+.dropdown-item:hover {
+    background-color: var(--brand-red);
+    color: white;
+    transform: translateX(5px);
+}
+
+.dropdown-item i {
+    width: 16px;
+    text-align: center;
+}
+
+.dropdown-divider {
+    margin: 0.5rem 0;
+    border-color: var(--border-color);
+}
+
+#userDropdown {
+    border-radius: 25px;
+    padding: 0.5rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease-in-out;
+}
+
+#userDropdown:hover {
+    background-color: var(--brand-red);
+    border-color: var(--brand-red);
+    transform: scale(1.05);
+}
+
+#userDropdown:focus {
+    box-shadow: 0 0 0 0.2rem rgba(225, 6, 0, 0.25);
+}
+
+/* --- Custom Alert System --- */
+.custom-alert {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border: 2px solid #28a745;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    z-index: 10000;
+    text-align: center;
+    min-width: 300px;
+    display: none;
+}
+
+.custom-alert.error {
+    border-color: #dc3545;
+}
+
+.custom-alert button {
+    margin-top: 15px;
+    padding: 8px 20px;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.custom-alert.error button {
+    background: #dc3545;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 9999;
+    display: none;
+}
+

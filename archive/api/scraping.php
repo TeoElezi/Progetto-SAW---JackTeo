@@ -1,7 +1,7 @@
 <?php
-    include '../config/config.php'; // Connessione al DB
+    require_once __DIR__ . '/../config/config.php'; // Connessione al DB
     //SEZIONE DEDICATA ALL'AGGIORNAMENTO DEI PUNTI DEI PILOTI
-    $html = file_get_contents('https://racingnews365.com/formula-1-drivers'); 
+    $html = file_get_contents('https://racingnews365.com/formula-1-drivers');
     libxml_use_internal_errors(true);
     $dom = new DOMDocument();
     $dom->loadHTML($html);
@@ -24,8 +24,10 @@
         // Se il pilota esiste, aggiorna i punti
         if ($stmt_check->num_rows > 0) {
             // Aggiorna i punti
-            $stmt_update = $conn->prepare("UPDATE drivers SET points = ?,image_url = ? WHERE name = ?");
-            $stmt_update->bind_param("dss", $punti, $imageurl, $nome);            if ($stmt_update->execute()) {
+            $stmt_update = $conn->prepare("UPDATE drivers SET points = ?, image_url = ? WHERE name = ?");
+            $puntiInt = (int)$punti;
+            $stmt_update->bind_param("iss", $puntiInt, $imageurl, $nome);
+            if ($stmt_update->execute()) {
                 echo "Punti aggiornati per " . $nome . "<br>";
             } else {
                 echo "Errore nell'aggiornamento dei punti: " . $stmt_update->error . "<br>";
@@ -34,7 +36,8 @@
         } else {
             // Se il pilota non esiste, inserisci i dati
             $stmt_insert = $conn->prepare("INSERT INTO drivers (name, points, image_url) VALUES (?, ?, ?)");
-            $stmt_insert->bind_param("sds", $nome, $punti, $imageurl);
+            $puntiInt = (int)$punti;
+            $stmt_insert->bind_param("sis", $nome, $puntiInt, $imageurl);
             if ($stmt_insert->execute()) {
                 echo "Dati inseriti per " . $nome . "<br>";
             } else {
@@ -67,7 +70,8 @@
         if ($stmt_check->num_rows > 0) {
             // Aggiorna i punti
             $stmt_update = $conn->prepare("UPDATE teams SET points = ? WHERE name = ?");
-            $stmt_update->bind_param("ss", $punti, $nome);
+            $puntiInt = (int)$punti;
+            $stmt_update->bind_param("is", $puntiInt, $nome);
             if ($stmt_update->execute()) {
                 echo "Punti aggiornati per " . $nome . "<br>";
             } else {
@@ -77,7 +81,8 @@
         } else {
             // Se il team non esiste, inserisci i dati
             $stmt_insert = $conn->prepare("INSERT INTO teams (name, points) VALUES (?, ?)");
-            $stmt_insert->bind_param("ss", $nome, $punti);
+            $puntiInt = (int)$punti;
+            $stmt_insert->bind_param("si", $nome, $puntiInt);
             if ($stmt_insert->execute()) {
                 echo "Dati inseriti per " . $nome . "<br>";
             } else {
@@ -88,4 +93,3 @@
         // Chiudi la dichiarazione
         $stmt_check->close();
     }
-?>

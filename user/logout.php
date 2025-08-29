@@ -1,7 +1,11 @@
 <?php
-    session_start();  // 1. Inizia la sessione
-    session_unset();    // 2. Svuota tutte le variabili di sessione
-    session_destroy();  // 3. Distrugge la sessione
-    header("Location: ../pages/index.php");  // 4. Dopo il logout, rimanda alla home
+    require_once '../config/config.php'; 
+    require_once '../includes/session.php';
+    clear_remember_cookie();
+    session_unset();
+    session_destroy();
+    setcookie(session_name(), '', time() - 3600, '/');
+    $conn->close();
+    header("Location: ../pages/index.php");
     exit();
 ?>

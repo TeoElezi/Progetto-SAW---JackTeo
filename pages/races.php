@@ -24,7 +24,7 @@ function getRaces($conn) {
         th, td {
             padding: 12px 15px;
             text-align: center;
-            border: 1px solid #ddd;
+            border: 1px solid #ddd;;
         }
 
         h1 {
@@ -45,6 +45,7 @@ function getRaces($conn) {
             max-width: 100px;
             height: auto;
             border-radius: 5px;
+            filter: drop-shadow(0 4px 8px black);
         }
 
         tr:nth-child(even) {
@@ -61,7 +62,7 @@ function getRaces($conn) {
     <h1>Gare di Formula 1</h1>
     <table>
         <tr>
-            <th>ID</th>
+            <th>N°</th>
             <th>Nome</th>
             <th>Data</th>
             <th>Luogo</th>

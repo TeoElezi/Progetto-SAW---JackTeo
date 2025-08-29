@@ -1,11 +1,7 @@
 <?php
 require_once __DIR__ . '/../config/config.php';
-?>
-
-<?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+require_once __DIR__ . '/session.php';
+require_once __DIR__ . '/auto_fetch_news.php';
 ?>
 <!DOCTYPE html>
 <html lang="it">
@@ -17,11 +13,14 @@ if (session_status() === PHP_SESSION_NONE) {
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="<?php echo getBasePath(); ?>assets/css/style.css">
 
     <!-- Icona F1 -->
-    <link rel="icon" href="../assets/images/fanhub.jpeg" type="image/x-icon">
+    <link rel="icon" href="<?php echo getBasePath(); ?>assets/images/fanhub.jpeg" type="image/x-icon">
 </head>
 <body class="bg-light text-dark">
 
@@ -63,10 +62,18 @@ if (session_status() === PHP_SESSION_NONE) {
                         <small class="d-block text-light">Accedi</small>
                     </a>
                 <?php else: ?>
-                    <div class="d-flex align-items-center ms-3">
-                        <small class="d-block text-light me-2"><?php echo htmlspecialchars($_SESSION['nome']); ?></small>
-                        <a href="../user/profilePage.php" class="btn btn-outline-light me-2">Profilo</a>
-                        <a href="../user/logout.php" class="btn btn-danger text-dark">Logout</a>
+                    <div class="dropdown ms-3">
+                        <button class="btn btn-outline-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user me-2"></i><?php echo htmlspecialchars($_SESSION['nome']); ?>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="../user/profilePage.php"><i class="fas fa-user-circle me-2"></i>Profilo</a></li>
+                            <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']): ?>
+                                <li><a class="dropdown-item" href="../admin/index.php"><i class="fas fa-cog me-2"></i>Area Amministrativa</a></li>
+                            <?php endif; ?>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="../user/logout.php"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                        </ul>
                     </div>
                 <?php endif; ?>
 
