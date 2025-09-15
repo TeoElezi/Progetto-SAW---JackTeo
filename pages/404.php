@@ -7,7 +7,7 @@ include '../includes/header.php'; // Se vuoi mantenere l'header
     <h1 class="display-4 fw-bold text-danger">404 - Pagina non trovata</h1>
     <p class="lead text-secondary mb-4">Sembra che tu abbia preso una curva sbagliata nel circuito.</p>
     <p class="lead text-secondary mb-4">Oops! Stai cercando qualcosa che non esiste ancora, il sito è ancora in costruzione.</p>
-    <a href="../pages/index.php" class="btn btn-danger btn-lg">Torna alla Home</a>
+    <a href="../index.php" class="btn btn-danger btn-lg">Torna alla Home</a>
 </div>
 
 <?php

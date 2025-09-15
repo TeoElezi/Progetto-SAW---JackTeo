@@ -83,14 +83,17 @@ require_once '../config/config.php';
 </div>
 
 <?php
-// Salvataggio donazione (fallback manuale)
-if (isset($_POST['donate'])) {
-  $name = mysqli_real_escape_string($conn, $_POST['name']);
-  $amount = (int) $_POST['amount'];
-
-  if ($amount > 0) {
-    mysqli_query($conn, "INSERT INTO donations (name, amount, created_at) VALUES ('$name', $amount, NOW())");
-    echo "<script>window.location.href = 'donazioni.php';</script>";
+// Salvataggio donazione (fallback manuale) con prepared statements
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'], $_POST['amount'])) {
+  $name = trim($_POST['name']);
+  $amount = (float) $_POST['amount'];
+  if ($name !== '' && $amount > 0) {
+    if ($stmt = $conn->prepare("INSERT INTO donations (name, amount, created_at) VALUES (?, ?, NOW())")) {
+      $stmt->bind_param('sd', $name, $amount);
+      $stmt->execute();
+      $stmt->close();
+      echo "<script>window.location.href = 'donazioni.php';</script>";
+    }
   }
 }
 ?>
@@ -157,8 +160,17 @@ if (isset($_POST['donate'])) {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
+        }).then(async (res) => {
+          if (!res.ok) {
+            const msg = await res.text().catch(() => '');
+            throw new Error(msg || 'Verifica pagamento fallita');
+          }
+          return res.json().catch(() => ({}));
         }).then(() => {
           window.location.href = 'donazioni.php';
+        }).catch((err) => {
+          console.error('Verify failed', err);
+          alert('Pagamento effettuato su PayPal ma non registrato sul sito. Contattaci con l\'ID ordine: ' + data.orderID);
         });
       });
     },

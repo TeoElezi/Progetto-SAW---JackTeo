@@ -10,11 +10,11 @@
             <div class="col-md-6 mb-3">
                 <h5 class="text-danger">F1 FanHub</h5>
                 <ul class="list-unstyled">
-                    <li><a href="../pages/news.php" class="text-decoration-none text-light small">Notizie</a></li>
-                    <li><a href="../pages/races.php" class="text-decoration-none text-light small">Gare</a></li>
-                    <li><a href="../pages/drivers.php" class="text-decoration-none text-light small">Piloti</a></li>
-                    <li><a href="../pages/teams.php" class="text-decoration-none text-light small">Team</a></li>
-                    <li><a href="../pages/standings.php" class="text-decoration-none text-light small">Classifiche</a></li>
+                    <li><a href="<?php echo getBasePath(); ?>pages/news.php" class="text-decoration-none text-light small">Notizie</a></li>
+                    <li><a href="<?php echo getBasePath(); ?>pages/races.php" class="text-decoration-none text-light small">Gare</a></li>
+                    <li><a href="<?php echo getBasePath(); ?>pages/drivers.php" class="text-decoration-none text-light small">Piloti</a></li>
+                    <li><a href="<?php echo getBasePath(); ?>pages/teams.php" class="text-decoration-none text-light small">Team</a></li>
+                    <li><a href="<?php echo getBasePath(); ?>pages/standings.php" class="text-decoration-none text-light small">Classifiche</a></li>
                 </ul>
             </div>
 

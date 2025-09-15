@@ -118,7 +118,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $_SESSION['register_rate_limit'][$clientIp] = [];
         $stmt->close();
         $conn->close();
-        header("Location: ../pages/index.php?success=registration_success");
+        header("Location: ../index.php?success=registration_success");
         exit();
     } else {
         $stmt->close();

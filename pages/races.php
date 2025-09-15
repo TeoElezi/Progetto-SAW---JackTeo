@@ -1,88 +1,110 @@
 <?php
 // Funzione per recuperare i dati delle gare dal database
 function getRaces($conn) {
-    $sql = "SELECT id, name, date, location, circuit_img FROM races";
-    $result = $conn->query($sql);
-    return $result;
+    $sql = "SELECT id, name, date, location, circuit_img FROM races ORDER BY date ASC";
+    return $conn->query($sql);
 }
+
+include '../includes/header.php';
+
+// Recupera gare e separa prossime e passate
+$racesResult = getRaces($conn);
+$races = [];
+if ($racesResult && $racesResult->num_rows > 0) {
+    while ($row = $racesResult->fetch_assoc()) {
+        $races[] = $row;
+    }
+}
+
+$today = new DateTime('now');
 ?>
 
-<?php include '../includes/header.php'; ?>
-<head>
-    <style>
-        
-        tr {
-            color: black;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 0 auto;
-            background-color: #fff;
-        }
+<div class="container py-4">
+    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4">
+        <h1 class="mb-3 mb-md-0" style="color:#c30000;">Gare di Formula 1</h1>
+        <div class="d-flex gap-2">
+            <div class="btn-group" role="group" aria-label="Filtri">
+                <button type="button" class="btn btn-outline-danger active" data-filter="all">Tutte</button>
+                <button type="button" class="btn btn-outline-danger" data-filter="upcoming">Prossime</button>
+                <button type="button" class="btn btn-outline-danger" data-filter="past">Passate</button>
+            </div>
+            <div class="ms-0 ms-md-2">
+                <input id="raceSearch" type="search" class="form-control" placeholder="Cerca circuito o luogo..." aria-label="Cerca">
+            </div>
+        </div>
+    </div>
 
-        th, td {
-            padding: 12px 15px;
-            text-align: center;
-            border: 1px solid #ddd;;
-        }
+    <?php if (empty($races)): ?>
+        <div class="alert alert-info">Nessuna gara trovata.</div>
+    <?php else: ?>
+        <div id="racesGrid" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            <?php foreach ($races as $race):
+                $raceDate = new DateTime($race['date']);
+                $isUpcoming = $raceDate >= $today;
+                $badge = $isUpcoming ? '<span class="badge bg-success ms-2">Prossima</span>' : '<span class="badge bg-secondary ms-2">Passata</span>';
+            ?>
+            <div class="col" data-name="<?php echo htmlspecialchars(strtolower($race['name'] . ' ' . $race['location'])); ?>" data-type="<?php echo $isUpcoming ? 'upcoming' : 'past'; ?>">
+                <div class="card h-100 shadow-sm">
+                    <?php if (!empty($race['circuit_img'])): ?>
+                        <img src="<?php echo htmlspecialchars($race['circuit_img']); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($race['name']); ?>">
+                    <?php endif; ?>
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title d-flex align-items-center justify-content-between">
+                            <span><?php echo htmlspecialchars($race['name']); ?></span>
+                            <?php echo $badge; ?>
+                        </h5>
+                        <div class="text-muted mb-2">
+                            <i class="fas fa-map-marker-alt me-2"></i><?php echo htmlspecialchars($race['location']); ?>
+                        </div>
+                        <div class="mb-3">
+                            <i class="fas fa-calendar-day me-2"></i><?php echo $raceDate->format('d M Y'); ?>
+                        </div>
+                        <div class="mt-auto d-flex justify-content-between align-items-center">
+                            <a href="<?php echo getBasePath(); ?>pages/404.php" class="btn btn-outline-dark btn-sm">Dettagli</a>
+                            <?php if ($isUpcoming): ?>
+                                <span class="small text-muted">Manca poco al via</span>
+                            <?php else: ?>
+                                <span class="small text-muted">Evento concluso</span>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+</div>
 
-        h1 {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #c30000;
-        }
-        th {
-            background-color: #c30000;
-            color: white;
-        }
+<script>
+(function(){
+    const buttons = document.querySelectorAll('[data-filter]');
+    const grid = document.getElementById('racesGrid');
+    const cards = grid ? grid.querySelectorAll('.col') : [];
+    const search = document.getElementById('raceSearch');
+    let current = 'all';
 
-        td {
-            background-color: #f9f9f9;
-        }
+    function apply() {
+        const q = (search?.value || '').trim().toLowerCase();
+        cards.forEach(card => {
+            const type = card.getAttribute('data-type');
+            const name = card.getAttribute('data-name');
+            const matchType = (current === 'all') || (type === current);
+            const matchText = q === '' || (name && name.indexOf(q) !== -1);
+            card.style.display = (matchType && matchText) ? '' : 'none';
+        });
+    }
 
-        td img {
-            max-width: 100px;
-            height: auto;
-            border-radius: 5px;
-            filter: drop-shadow(0 4px 8px black);
-        }
+    buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            buttons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            current = btn.getAttribute('data-filter');
+            apply();
+        });
+    });
 
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
+    search?.addEventListener('input', apply);
+})();
+</script>
 
-        .no-races {
-            text-align: center;
-            padding: 20px;
-            font-size: 1.2em;
-            color: #555;
-        }
-    </style>
-    <h1>Gare di Formula 1</h1>
-    <table>
-        <tr>
-            <th>N°</th>
-            <th>Nome</th>
-            <th>Data</th>
-            <th>Luogo</th>
-            <th>Immagine del Circuito</th>
-        </tr>
-        <?php
-        $races = getRaces($conn);
-        if ($races->num_rows > 0) {
-            while ($row = $races->fetch_assoc()) {
-                echo "<tr>";
-                echo "<td>" . htmlspecialchars($row['id']) . "</td>";
-                echo "<td>" . htmlspecialchars($row['name']) . "</td>";
-                echo "<td>" . htmlspecialchars($row['date']) . "</td>";
-                echo "<td>" . htmlspecialchars($row['location']) . "</td>";
-                echo "<td><img src='" . htmlspecialchars($row['circuit_img']) . "' alt='Circuito' class='circuit-img'></td>";
-                echo "</tr>";
-            }
-        } else {
-            echo "<tr><td colspan='5' class='no-races'>Nessuna gara trovata</td></tr>";
-        }
-        ?>
-    </table>
 <?php include '../includes/footer.php'; ?>

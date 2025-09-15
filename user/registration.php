@@ -1,7 +1,7 @@
 <?php
   require_once '../includes/session.php';
   if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
-    header('Location: ../pages/index.php');
+    header('Location: ../index.php');
     exit();
   }
   include_once '../includes/header.php';
@@ -45,6 +45,9 @@
         </div>
 
         <button type="submit" class="btn btn-dark w-100">Registrati</button>
+        <div class="text-center mt-3">
+          <a href="login.php" class="btn btn-outline-secondary w-100">Torna al login</a>
+        </div>
       </form>
     </div>
   </div>

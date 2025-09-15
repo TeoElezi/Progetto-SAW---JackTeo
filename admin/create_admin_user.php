@@ -4,6 +4,14 @@ require_once '../config/config.php';
 // Script per creare un utente amministratore di test
 // ATTENZIONE: Questo script dovrebbe essere rimosso in produzione
 
+// Limita l'accesso allo script: solo da localhost in ambienti di sviluppo
+$clientIp = $_SERVER['REMOTE_ADDR'] ?? '';
+if ($clientIp !== '127.0.0.1' && $clientIp !== '::1') {
+    http_response_code(403);
+    echo "<h2>Accesso negato</h2><p>Questo script è disponibile solo in locale.</p>";
+    exit;
+}
+
 echo "<h2>Creazione Utente Amministratore</h2>";
 
 // Verifica se esiste già un utente amministratore

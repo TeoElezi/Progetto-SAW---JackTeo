@@ -3,10 +3,10 @@ function getBasePath() {
     $dirName = basename(dirname(__DIR__));
     return '/' . rawurlencode($dirName) . '/';
 }
-$paypalClientId = 'Ad0E-Fmama54pAeeymJwsOewpCUYTaAL05bjbd_s_Xn8-Tomq6J5xTbGXS27HWhdmtfasDSKgzCSKxF_';
-$paypalCurrency = 'EUR';
-$paypalEnvironment = 'sandbox';
-$paypalClientSecret = getenv('PAYPAL_CLIENT_SECRET') ?: '';
+$paypalClientId = getenv('PAYPAL_CLIENT_ID') ?: 'Ad0E-Fmama54pAeeymJwsOewpCUYTaAL05bjbd_s_Xn8-Tomq6J5xTbGXS27HWhdmtfasDSKgzCSKxF_';
+$paypalCurrency = getenv('PAYPAL_CURRENCY') ?: 'EUR';
+$paypalEnvironment = getenv('PAYPAL_ENV') ?: 'sandbox';
+$paypalClientSecret = getenv('PAYPAL_CLIENT_SECRET') ?: 'EHf6I_EQSx3B3bYjfBIq7Wy_jLXZoywBgej64-RefDtqDhLmkqB2Gyl5JfveSI9-e-kGy3Sw2ufmjqbM';
 $host = 'localhost';
 $user = 'root';
 $password = ''; // oppure la tua password se l'hai impostata

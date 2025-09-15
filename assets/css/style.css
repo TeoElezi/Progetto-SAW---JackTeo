@@ -1,6 +1,3 @@
-/* style.css */
-/* --- Font & colore di base --- */
-
 :root {
     --brand-red: #E10600;
     --text-color: #212529;
@@ -14,18 +11,15 @@
     src: url('../fonts/Formula1-Bold.otf') format('opentype');
 }
 
-/* Scrollbar invisibile per Chrome, Edge, Safari */
 body::-webkit-scrollbar,
 html::-webkit-scrollbar {
-    width: 0px;
+    width: 0;
     background: transparent;
 }
 
 body {
-    /* Scrollbar */
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE/Edge */
-    /* Base */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
     font-family: 'f1-font', sans-serif;
     background-color: var(--bg-body);
     color: var(--text-color);
@@ -45,15 +39,11 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url("../images/bg-image.jpg");
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
+    background: url("../images/bg-image.jpg") no-repeat center/cover fixed;
     filter: blur(8px);
     z-index: -1;
 }
 
-/* --- Titoli customizzati --- */
 h1, h2, h3 {
     font-weight: 700;
     color: var(--brand-red);
@@ -66,7 +56,6 @@ h2 {
     margin-bottom: 1.5rem;
 }
 
-/* --- Navbar personalizzata --- */
 .nav-link,
 .navbar-brand {
     color: white;
@@ -88,17 +77,14 @@ h2 {
     transition: box-shadow 0.2s ease-in-out;
 }
 
-/* Barra rossa ticker */
 .bg-danger {
     background-color: var(--brand-red) !important;
 }
 
-/* Logo */
 img[alt="F1 FanHub"] {
     filter: brightness(0) invert(1);
 }
 
-/* --- Card Notizie --- */
 .card {
     transition: transform 0.2s ease-in-out;
     border: none;
@@ -106,22 +92,26 @@ img[alt="F1 FanHub"] {
     will-change: transform;
 }
 
+.card-img-top {
+    object-fit: contain;
+    background-color: rgb(255, 255, 255);
+    padding: 8px;
+}
+
 .card:hover {
     transform: translateY(-5px);
     box-shadow: inset 2px -2px 2px var(--brand-red);
 }
 
-/* --- Countdown --- */
 #countdown {
     font-weight: bold;
     color: white;
     border-radius: 5px;
 }
 
-/* --- Lista Classifica --- */
 .list-group-item {
     font-weight: 500;
-    background-color: #fff;
+    background: #fff;
     border: 1px solid var(--border-color);
 }
 
@@ -129,9 +119,8 @@ img[alt="F1 FanHub"] {
     font-size: 1rem;
 }
 
-/* --- Footer --- */
 footer {
-    background-color: #212529;
+    background: #212529;
     color: #fff;
     font-size: 0.9rem;
 }
@@ -141,20 +130,14 @@ footer a:hover {
     text-decoration: underline;
 }
 
-/* --- Enhancements conservativi (non invasivi) --- */
-/* Mantiene le animazioni esistenti ma migliora performance e accessibilità */
-
 @media (prefers-reduced-motion: reduce) {
     * { transition: none !important; animation: none !important; }
     .card:hover { transform: none !important; }
 }
 
-/* Stili ricorrenti (non invasivi) */
 .race-box {
     border-radius: 15px;
-    margin-left: auto;
-    margin-right: auto;
-    margin-bottom: 40px;
+    margin: 0 auto 40px;
     box-shadow: var(--shadow-md);
     position: relative;
 }
@@ -164,10 +147,11 @@ footer a:hover {
     object-fit: contain;
 }
 
-/* Tabelle leggibili senza toccare le pagine */
-table th, table td { text-align: center; }
+table th,
+table td {
+    text-align: center;
+}
 
-/* --- User Dropdown Menu --- */
 .dropdown-menu {
     border: none;
     box-shadow: var(--shadow-md);
@@ -180,7 +164,6 @@ table th, table td { text-align: center; }
     padding: 0.75rem 1.5rem;
     color: var(--text-color);
     transition: all 0.2s ease-in-out;
-    border: none;
     background: transparent;
 }
 
@@ -217,7 +200,6 @@ table th, table td { text-align: center; }
     box-shadow: 0 0 0 0.2rem rgba(225, 6, 0, 0.25);
 }
 
-/* --- Custom Alert System --- */
 .custom-alert {
     position: fixed;
     top: 50%;
@@ -262,4 +244,3 @@ table th, table td { text-align: center; }
     z-index: 9999;
     display: none;
 }
-

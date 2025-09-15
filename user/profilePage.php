@@ -1,6 +1,10 @@
 <?php
 require_once '../config/config.php';
 require_once '../includes/session.php';
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+    header('Location: ../user/login.php?error=access_denied');
+    exit();
+}
 ?>
 
 <!-- Navbar -->
@@ -109,12 +113,15 @@ require_once '../includes/session.php';
           </div>
 
           <div class="text-center mt-5">
-            <a href="../pages/index.php" class="btn btn-outline-dark me-3">
+            <a href="../index.php" class="btn btn-outline-dark me-3">
               <i class="fas fa-home me-1"></i>Torna alla Home
             </a>
             <a href="../user/logout.php" class="btn btn-danger">
               <i class="fas fa-sign-out-alt me-1"></i>Logout
             </a>
+            <button type="button" class="btn btn-outline-danger ms-3" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+              <i class="fas fa-user-slash me-1"></i>Elimina account
+            </button>
           </div>
         </div>
       </div>
@@ -122,11 +129,52 @@ require_once '../includes/session.php';
   </div>
 </div>
 
+<!-- Modale eliminazione account -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form action="profilePageProcess.php" method="POST">
+        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
+        <input type="hidden" name="action" value="delete_account">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title" id="deleteAccountLabel">
+            <i class="fas fa-triangle-exclamation me-2"></i>Conferma eliminazione account
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+        </div>
+        <div class="modal-body">
+          <p class="mb-3">Questa azione è permanente e non può essere annullata.</p>
+          <div class="mb-3">
+            <label for="confirmPassword" class="form-label fw-bold">Inserisci la tua password per confermare</label>
+            <input type="password" class="form-control" id="confirmPassword" name="confirm_password" required minlength="8" autocomplete="current-password">
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" value="1" id="confirmDelete" required>
+            <label class="form-check-label" for="confirmDelete">
+              Ho compreso che il mio account e i dati associati verranno eliminati.
+            </label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="fas fa-times me-1"></i>Annulla
+          </button>
+          <button type="submit" class="btn btn-danger">
+            <i class="fas fa-user-slash me-1"></i>Elimina definitivamente
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+</div>
+
 <!-- Modale per modifica del nome -->
 <div class="modal fade" id="modificaNomeModal" tabindex="-1" aria-labelledby="modificaNomeLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <form action="profilePageProcess.php" method="POST">
+        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
         <div class="modal-header bg-dark text-white">
           <h5 class="modal-title" id="modificaNomeLabel">
             <i class="fas fa-user-edit me-2"></i>Modifica Nome
@@ -157,6 +205,7 @@ require_once '../includes/session.php';
   <div class="modal-dialog">
     <div class="modal-content">
       <form action="profilePageProcess.php" method="POST">
+        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
         <div class="modal-header bg-dark text-white">
           <h5 class="modal-title" id="modificaCognomeLabel">
             <i class="fas fa-user-edit me-2"></i>Modifica Cognome
@@ -187,6 +236,7 @@ require_once '../includes/session.php';
   <div class="modal-dialog">
     <div class="modal-content">
       <form action="profilePageProcess.php" method="POST">
+        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
         <div class="modal-header bg-dark text-white">
           <h5 class="modal-title" id="modificaEmailLabel">
             <i class="fas fa-envelope me-2"></i>Modifica Email
@@ -217,6 +267,7 @@ require_once '../includes/session.php';
   <div class="modal-dialog">
     <div class="modal-content">
       <form action="profilePageProcess.php" method="POST">
+        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
         <div class="modal-header bg-dark text-white">
           <h5 class="modal-title" id="modificaNewsletterLabel">
             <i class="fas fa-newspaper me-2"></i>Gestione Newsletter

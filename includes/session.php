@@ -33,6 +33,22 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// Idle timeout enforcement (20 minutes)
+if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
+    $now = time();
+    $timeoutSeconds = 60 * 60 * 24 * 30; // 30 days
+    if (isset($_SESSION['last_activity']) && ($now - (int)$_SESSION['last_activity']) > $timeoutSeconds) {
+        // Session expired due to inactivity
+        clear_remember_cookie();
+        session_unset();
+        session_destroy();
+        setcookie(session_name(), '', time() - 3600, '/');
+        header('Location: ../user/login.php?error=session_timeout');
+        exit();
+    }
+    $_SESSION['last_activity'] = $now;
+}
+
 // Ensure a CSRF token exists
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -205,7 +221,7 @@ function clear_remember_cookie($user_id = null) {
 }
 
 // Auto-login with remember me cookie
-if (!isset($_SESSION['logged_in']) && !isset($_SESSION['logged_in'])) {
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     validate_remember_cookie();
 }
 

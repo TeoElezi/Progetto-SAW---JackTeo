@@ -6,6 +6,6 @@
     session_destroy();
     setcookie(session_name(), '', time() - 3600, '/');
     $conn->close();
-    header("Location: ../pages/index.php");
+    header("Location: ../index.php");
     exit();
 ?>

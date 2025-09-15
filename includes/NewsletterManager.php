@@ -303,9 +303,28 @@ class NewsletterManager {
      * Genera link per disiscrizione
      */
     private function generateUnsubscribeLink($email) {
-        $token = hash('sha256', $email . 'unsubscribe' . date('Y-m-d'));
-        $base_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]";
-        return $base_url . '/user/unsubscribe.php?email=' . urlencode($email) . '&token=' . $token;
+        // Token con HMAC e scadenza
+        $expiresAt = time() + (NEWSLETTER_UNSUBSCRIBE_EXPIRY_DAYS * 86400);
+        $payload = $email . '|' . $expiresAt;
+        $signature = hash_hmac('sha256', $payload, defined('NEWSLETTER_UNSUBSCRIBE_SECRET') ? NEWSLETTER_UNSUBSCRIBE_SECRET : '');
+        $token = base64_encode($payload . '|' . $signature);
+
+        $scheme = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https' : 'http';
+        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+        $base_url = $scheme . '://' . $host;
+
+        // Determina il base path dell'app (gestisce sottocartelle come /progetto%20saw%20jackteo/)
+        $basePath = '/';
+        $configPath = __DIR__ . '/../config/config.php';
+        if (file_exists($configPath)) {
+            require_once $configPath;
+            if (function_exists('getBasePath')) {
+                $basePath = getBasePath(); // es. '/progetto%20saw%20jackteo/'
+            }
+        }
+        $pathPrefix = rtrim($basePath, '/'); // '' oppure '/progetto%20saw%20jackteo'
+
+        return $base_url . $pathPrefix . '/user/unsubscribe.php?email=' . urlencode($email) . '&token=' . urlencode($token);
     }
     
     /**

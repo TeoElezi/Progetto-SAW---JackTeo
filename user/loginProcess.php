@@ -77,7 +77,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         $stmt->close();
         $conn->close();
-        header("Location: ../pages/index.php?success=login_success");
+        header("Location: ../index.php?success=login_success");
         exit();
     } else {
         // Record failed attempt

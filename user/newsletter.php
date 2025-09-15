@@ -121,7 +121,7 @@ $_SESSION['newsletter'] = $newsletter_status;
                     </div>
                     
                     <div class="mt-3">
-                        <a href="../pages/index.php" class="btn btn-outline-primary">Torna alla Home</a>
+                        <a href="../index.php" class="btn btn-outline-primary">Torna alla Home</a>
                         <a href="profilePage.php" class="btn btn-outline-secondary">Profilo</a>
                     </div>
                 </div>

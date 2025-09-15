@@ -120,7 +120,7 @@ $stmt->close();
                     <a href="subscribers.php" class="list-group-item list-group-item-action active">
                         <i class="fas fa-address-book me-2"></i>Iscritti
                     </a>
-                    <a href="../pages/index.php" class="list-group-item list-group-item-action">
+                    <a href="../index.php" class="list-group-item list-group-item-action">
                         <i class="fas fa-home me-2"></i>Torna al Sito
                     </a>
                 </div>

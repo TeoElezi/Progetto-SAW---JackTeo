@@ -1,8 +1,8 @@
 <?php
-require_once '../config/config.php';
+require_once 'config/config.php';
 ?>
 <!-- Navbar -->
-<?php include '../includes/header.php' ?>
+<?php include 'includes/header.php' ?>
   
 <!-- Contenuto principale -->
 <div class="container my-5">
@@ -17,7 +17,7 @@ require_once '../config/config.php';
     <p>
     Il nostro obiettivo è creare un punto di riferimento per i fan, con contenuti aggiornati, curiosità, statistiche e una community in continua crescita.  
     </p>
-    <button class="btn btn-outline-dark" href="404.php">Scopri chi siamo</button>
+    <a class="btn btn-outline-dark" href="<?php echo getBasePath(); ?>pages/404.php">Scopri chi siamo</a>
   </div>
   </div>
 
@@ -49,7 +49,7 @@ require_once '../config/config.php';
         if (!empty($row['link'])) {
           echo '      <a href="' . htmlspecialchars($row['link']) . '" class="btn btn-primary" target="_blank">Leggi su ESPN</a>';
         } else {
-          echo '      <a href="news_detail.php?id=' . $row['id'] . '" class="btn btn-primary">Leggi</a>';
+          echo '      <a href="' . getBasePath() . 'pages/news_detail.php?id=' . $row['id'] . '" class="btn btn-primary">Leggi</a>';
         }
 
         echo '    </div>';
@@ -76,7 +76,7 @@ require_once '../config/config.php';
         if (!empty($row['link'])) {
           echo '      <a href="' . htmlspecialchars($row['link']) . '" class="btn btn-primary" target="_blank">Leggi su ESPN</a>';
         } else {
-          echo '      <a href="news_detail.php?id=' . $row['id'] . '" class="btn btn-primary">Leggi</a>';
+          echo '      <a href="' . getBasePath() . 'pages/news_detail.php?id=' . $row['id'] . '" class="btn btn-primary">Leggi</a>';
         }
 
         echo '    </div>';
@@ -108,7 +108,7 @@ require_once '../config/config.php';
           <p class="mb-0 text-muted">Aiutaci a sviluppare nuove funzionalità e far crescere la community. Anche una piccola donazione fa la differenza.</p>
         </div>
         <div>
-          <a href="../payments/donazioni.php" class="btn btn-danger btn-lg">Dona ora</a>
+          <a href="<?php echo getBasePath(); ?>payments/donazioni.php" class="btn btn-danger btn-lg">Dona ora</a>
         </div>
       </div>
     </div>
@@ -192,7 +192,7 @@ require_once '../config/config.php';
   </div>
 </div>
 <!-- Footer -->
-<?php include '../includes/footer.php' ?>
+<?php include 'includes/footer.php' ?>
 
 
 
@@ -206,7 +206,9 @@ require_once '../config/config.php';
 <!-- Pass the race date to JavaScript -->
 <script>
   const raceDate = "<?php echo $raceDate ? date('Y-m-d\TH:i:s', strtotime($raceDate)) : '1970-01-01T00:00:00'; ?>";
-</script>
+  </script>
 
 <!-- Include the countdown.js file -->
-<script src="../assets/js/countdown.js"></script>
+<script src="<?php echo getBasePath(); ?>assets/js/countdown.js"></script>
+
+

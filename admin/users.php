@@ -63,6 +63,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['csrf_token'])) {
                 $error = 'Errore durante l\'aggiornamento dell\'utente.';
             }
             $stmt->close();
+        } elseif ($action_type === 'update_profile_fields') {
+            $user_id = intval($_POST['user_id'] ?? 0);
+            $name = trim($_POST['name'] ?? '');
+            $surname = trim($_POST['surname'] ?? '');
+            $email = strtolower(trim($_POST['email'] ?? ''));
+            if ($name === '' || $surname === '' || $email === '') {
+                $error = 'Tutti i campi sono obbligatori.';
+            } elseif (!preg_match("/^[a-zA-ZÀ-ÿ\s]{2,50}$/u", $name) || !preg_match("/^[a-zA-ZÀ-ÿ\s]{2,50}$/u", $surname)) {
+                $error = 'Nome o cognome non validi.';
+            } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email) > 255) {
+                $error = 'Email non valida.';
+            } else {
+                // Unique email except current user
+                $stmt = $conn->prepare("SELECT id FROM users WHERE email = ? AND id <> ? LIMIT 1");
+                $stmt->bind_param('si', $email, $user_id);
+                $stmt->execute();
+                $exists = ($stmt->get_result()->num_rows > 0);
+                $stmt->close();
+                if ($exists) {
+                    $error = 'Email già in uso da un altro utente.';
+                } else {
+                    $stmt = $conn->prepare("UPDATE users SET name = ?, surname = ?, email = ? WHERE id = ?");
+                    $stmt->bind_param('sssi', $name, $surname, $email, $user_id);
+                    if ($stmt->execute()) {
+                        $success = 'Dati utente aggiornati.';
+                    } else {
+                        $error = 'Errore durante l\'aggiornamento dei dati utente.';
+                    }
+                    $stmt->close();
+                }
+            }
         } elseif ($action_type === 'delete_user') {
             $user_id_to_delete = $_POST['user_id'] ?? '';
             
@@ -123,7 +154,7 @@ if ($action === 'edit' && $user_id) {
                     <a href="subscribers.php" class="list-group-item list-group-item-action">
                         <i class="fas fa-address-book me-2"></i>Iscritti
                     </a>
-                    <a href="../pages/index.php" class="list-group-item list-group-item-action">
+                    <a href="../index.php" class="list-group-item list-group-item-action">
                         <i class="fas fa-home me-2"></i>Torna al Sito
                     </a>
                 </div>
@@ -226,33 +257,32 @@ if ($action === 'edit' && $user_id) {
                         <h5 class="mb-0">Modifica Utente: <?php echo htmlspecialchars($user['name'] . ' ' . $user['surname']); ?></h5>
                     </div>
                     <div class="card-body">
-                        <form method="POST">
-                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
-                            <input type="hidden" name="action_type" value="update_status">
-                            <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
-                            
-                            <div class="row">
-                                <div class="col-md-6">
+                        <div class="row g-4">
+                            <div class="col-lg-6">
+                                <form method="POST">
+                                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
+                                    <input type="hidden" name="action_type" value="update_profile_fields">
+                                    <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
                                     <div class="mb-3">
                                         <label class="form-label">Nome</label>
-                                        <input type="text" class="form-control" value="<?php echo htmlspecialchars($user['name']); ?>" readonly>
+                                        <input type="text" name="name" class="form-control" value="<?php echo htmlspecialchars($user['name']); ?>" required minlength="2" maxlength="50" pattern="[A-Za-zÀ-ÿ\s]+">
                                     </div>
-                                </div>
-                                <div class="col-md-6">
                                     <div class="mb-3">
                                         <label class="form-label">Cognome</label>
-                                        <input type="text" class="form-control" value="<?php echo htmlspecialchars($user['surname']); ?>" readonly>
+                                        <input type="text" name="surname" class="form-control" value="<?php echo htmlspecialchars($user['surname']); ?>" required minlength="2" maxlength="50" pattern="[A-Za-zÀ-ÿ\s]+">
                                     </div>
-                                </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Email</label>
+                                        <input type="email" name="email" class="form-control" value="<?php echo htmlspecialchars($user['email']); ?>" required maxlength="255">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Salva Dati</button>
+                                </form>
                             </div>
-                            
-                            <div class="mb-3">
-                                <label class="form-label">Email</label>
-                                <input type="email" class="form-control" value="<?php echo htmlspecialchars($user['email']); ?>" readonly>
-                            </div>
-                            
-                            <div class="row">
-                                <div class="col-md-6">
+                            <div class="col-lg-6">
+                                <form method="POST">
+                                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
+                                    <input type="hidden" name="action_type" value="update_status">
+                                    <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
                                     <div class="mb-3">
                                         <label for="newsletter" class="form-label">Newsletter</label>
                                         <select class="form-select" id="newsletter" name="newsletter">
@@ -260,8 +290,6 @@ if ($action === 'edit' && $user_id) {
                                             <option value="1" <?php echo $user['newsletter'] ? 'selected' : ''; ?>>Iscritto</option>
                                         </select>
                                     </div>
-                                </div>
-                                <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="is_admin" class="form-label">Ruolo</label>
                                         <select class="form-select" id="is_admin" name="is_admin">
@@ -269,14 +297,13 @@ if ($action === 'edit' && $user_id) {
                                             <option value="1" <?php echo $user['is_admin'] ? 'selected' : ''; ?>>Amministratore</option>
                                         </select>
                                     </div>
-                                </div>
+                                    <button type="submit" class="btn btn-secondary">Aggiorna Stato</button>
+                                </form>
                             </div>
-                            
-                            <div class="d-flex gap-2">
-                                <button type="submit" class="btn btn-primary">Aggiorna Utente</button>
-                                <a href="users.php" class="btn btn-secondary">Annulla</a>
-                            </div>
-                        </form>
+                        </div>
+                        <div class="mt-3">
+                            <a href="users.php" class="btn btn-outline-secondary">Torna alla lista</a>
+                        </div>
                     </div>
                 </div>
             <?php endif; ?>

@@ -1,7 +1,7 @@
 <?php
   require_once '../includes/session.php';
   if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
-    header('Location: ../pages/index.php');
+    header('Location: ../index.php');
     exit();
   }
 ?>
@@ -59,13 +59,14 @@
         <input type="checkbox" class="form-check-input" id="remember_me" name="remember_me">
         <label class="form-check-label" for="remember_me">Ricordami</label>
       </div>
+      
+      <button type="submit" class="btn btn-dark w-100 mb-3">Accedi</button>
 
       <div class="mb-3">
         <p class="mb-2">Non sei registrato?</p>
         <a href="registration.php" class="btn btn-outline-primary w-100" aria-label="Vai alla pagina di registrazione">Registrati</a>
       </div>
 
-      <button type="submit" class="btn btn-dark w-100">Accedi</button>
     </form>
   </div>
 </div>

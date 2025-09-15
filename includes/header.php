@@ -29,8 +29,8 @@ require_once __DIR__ . '/auto_fetch_news.php';
     <div class="header-container container py-3">
         <nav class="navbar navbar-expand-lg navbar-dark w-100">
             <!-- Logo e titolo -->
-            <a class="navbar-brand" href="../pages/index.php">
-                <img src="../assets/images/f1_logo_white.png" alt="F1 FanHub" width="150" class="me-2">
+            <a class="navbar-brand" href="<?php echo getBasePath(); ?>index.php">
+                <img src="<?php echo getBasePath(); ?>assets/images/f1_logo_white.png" alt="F1 FanHub" width="150" class="me-2">
                 <span class="fw-bold">FanHub - StartSaw</span>
             </a>
 
@@ -43,22 +43,22 @@ require_once __DIR__ . '/auto_fetch_news.php';
             <!-- Contenuto navbar -->
             <div class="collapse navbar-collapse" id="navbarContent">                <!-- Link -->
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="../pages/404.php">Notizie</a></li>
-                    <li class="nav-item"><a class="nav-link" href="../pages/races.php">Gare</a></li>
-                    <li class="nav-item"><a class="nav-link" href="../pages/drivers.php">Piloti</a></li>
-                    <li class="nav-item"><a class="nav-link" href="../pages/404.php">Team</a></li>
-                    <li class="nav-item"><a class="nav-link" href="../pages/404.php">Classifiche</a></li>
+                    <li class="nav-item"><a class="nav-link" href="<?php echo getBasePath(); ?>pages/404.php">Notizie</a></li>
+                    <li class="nav-item"><a class="nav-link" href="<?php echo getBasePath(); ?>pages/races.php">Gare</a></li>
+                    <li class="nav-item"><a class="nav-link" href="<?php echo getBasePath(); ?>pages/drivers.php">Piloti</a></li>
+                    <li class="nav-item"><a class="nav-link" href="<?php echo getBasePath(); ?>pages/404.php">Team</a></li>
+                    <li class="nav-item"><a class="nav-link" href="<?php echo getBasePath(); ?>pages/404.php">Classifiche</a></li>
                 </ul>
 
                 <!-- Search -->
-                <form class="d-flex ms-lg-auto mt-3 mt-lg-0" role="search" method="GET" action="../pages/search.php">
+                <form class="d-flex ms-lg-auto mt-3 mt-lg-0" role="search" method="GET" action="<?php echo getBasePath(); ?>pages/search.php">
                     <input class="form-control me-2" type="search" name="q" placeholder="Cerca..." aria-label="Cerca" required>
                     <button class="btn btn-outline-light" type="submit">Cerca</button>
                 </form>
                 <!-- Accesso / Profilo -->
                 <?php if (!isset($_SESSION["logged_in"]) || $_SESSION["logged_in"] !== true): ?>
-                    <a href="../user/login.php" class="text-decoration-none text-center d-block ms-3">
-                        <img src="../assets/images/user.png" alt="Accedi" class="rounded-circle" style="width: 70px; height: 70px;">
+                    <a href="<?php echo getBasePath(); ?>user/login.php" class="text-decoration-none text-center d-block ms-3">
+                        <img src="<?php echo getBasePath(); ?>assets/images/user.png" alt="Accedi" class="rounded-circle" style="width: 70px; height: 70px;">
                         <small class="d-block text-light">Accedi</small>
                     </a>
                 <?php else: ?>
@@ -67,12 +67,12 @@ require_once __DIR__ . '/auto_fetch_news.php';
                             <i class="fas fa-user me-2"></i><?php echo htmlspecialchars($_SESSION['nome']); ?>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                            <li><a class="dropdown-item" href="../user/profilePage.php"><i class="fas fa-user-circle me-2"></i>Profilo</a></li>
+                            <li><a class="dropdown-item" href="<?php echo getBasePath(); ?>user/profilePage.php"><i class="fas fa-user-circle me-2"></i>Profilo</a></li>
                             <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']): ?>
-                                <li><a class="dropdown-item" href="../admin/index.php"><i class="fas fa-cog me-2"></i>Area Amministrativa</a></li>
+                                <li><a class="dropdown-item" href="<?php echo getBasePath(); ?>admin/index.php"><i class="fas fa-cog me-2"></i>Area Amministrativa</a></li>
                             <?php endif; ?>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-danger" href="../user/logout.php"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                            <li><a class="dropdown-item text-danger" href="<?php echo getBasePath(); ?>user/logout.php"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
                         </ul>
                     </div>
                 <?php endif; ?>

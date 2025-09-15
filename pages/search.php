@@ -2,10 +2,24 @@
     include '../includes/header.php'; // Inclusione dell'header
 
     if (isset($_GET['q'])) {
-        $search = mysqli_real_escape_string($conn, $_GET['q']);
+        $search = trim($_GET['q']);
+        if (strlen($search) > 255) { $search = substr($search, 0, 255); }
+        $page = max(1, intval($_GET['page'] ?? 1));
+        $perPage = 10;
+        $offset = ($page - 1) * $perPage;
 
-        $query = "SELECT * FROM news WHERE title LIKE '%$search%' OR content LIKE '%$search%' ORDER BY posted_at DESC";
-        $result = mysqli_query($conn, $query);
+        // Count total
+        $stmtCount = $conn->prepare("SELECT COUNT(*) as total FROM news WHERE title LIKE CONCAT('%', ?, '%') OR content LIKE CONCAT('%', ?, '%')");
+        $stmtCount->bind_param('ss', $search, $search);
+        $stmtCount->execute();
+        $total = $stmtCount->get_result()->fetch_assoc()['total'] ?? 0;
+        $stmtCount->close();
+
+        // Fetch page
+        $stmt = $conn->prepare("SELECT * FROM news WHERE title LIKE CONCAT('%', ?, '%') OR content LIKE CONCAT('%', ?, '%') ORDER BY posted_at DESC LIMIT ? OFFSET ?");
+        $stmt->bind_param('ssii', $search, $search, $perPage, $offset);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         
 
@@ -28,9 +42,30 @@
                 echo '</div>';
             }
             echo '</div>';
+            // Pagination
+            $totalPages = (int)ceil($total / $perPage);
+            if ($totalPages > 1) {
+                echo '<nav aria-label="Risultati">';
+                echo '<ul class="pagination justify-content-center mt-4">';
+                if ($page > 1) {
+                    $p = $page - 1;
+                    echo '<li class="page-item"><a class="page-link" href="?q=' . urlencode($search) . '&page=' . $p . '">Precedente</a></li>';
+                }
+                for ($i = max(1, $page - 2); $i <= min($totalPages, $page + 2); $i++) {
+                    $active = $i === $page ? ' active' : '';
+                    echo '<li class="page-item' . $active . '"><a class="page-link" href="?q=' . urlencode($search) . '&page=' . $i . '">' . $i . '</a></li>';
+                }
+                if ($page < $totalPages) {
+                    $n = $page + 1;
+                    echo '<li class="page-item"><a class="page-link" href="?q=' . urlencode($search) . '&page=' . $n . '">Successiva</a></li>';
+                }
+                echo '</ul>';
+                echo '</nav>';
+            }
         } else {
             echo "<p>Nessun risultato trovato.</p>";
         }
+        $stmt->close();
     }
 include '../includes/footer.php'; // Inclusione del footer
 ?>

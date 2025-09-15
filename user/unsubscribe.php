@@ -1,6 +1,8 @@
 <?php
+require_once '../config/config.php';
 require_once '../includes/session.php';
 require_once '../includes/NewsletterManager.php';
+require_once '../config/email_config.php';
 
 $success = false;
 $error = '';
@@ -10,30 +12,42 @@ $email = '';
 if (isset($_GET['email']) && isset($_GET['token'])) {
     $email = $_GET['email'];
     $token = $_GET['token'];
-    
-    // Verifica token (semplificato per demo)
-    $expected_token = hash('sha256', $email . 'unsubscribe' . date('Y-m-d'));
-    
-    if (hash_equals($expected_token, $token)) {
+
+    // Decodifica e verifica token HMAC con scadenza
+    $decoded = base64_decode($token, true);
+    if ($decoded !== false) {
+        $parts = explode('|', $decoded);
+        if (count($parts) === 3) {
+            list($emailInToken, $expiresAt, $signature) = $parts;
+            $payload = $emailInToken . '|' . $expiresAt;
+            $expectedSig = hash_hmac('sha256', $payload, defined('NEWSLETTER_UNSUBSCRIBE_SECRET') ? NEWSLETTER_UNSUBSCRIBE_SECRET : '');
+            if (hash_equals($expectedSig, $signature) && hash_equals($emailInToken, $email) && (time() <= (int)$expiresAt)) {
         // Disiscrivi dalla newsletter
         $newsletterManager = new NewsletterManager($conn);
         if ($newsletterManager->removeSubscriber($email)) {
             $success = true;
-            
-            // Aggiorna anche la tabella users se l'utente è loggato
-            if (isset($_SESSION['logged_in']) && $_SESSION['email'] === $email) {
-                $stmt = $conn->prepare("UPDATE users SET newsletter = 0 WHERE email = ?");
-                $stmt->bind_param("s", $email);
-                $stmt->execute();
-                $stmt->close();
-                
+
+            // Aggiorna sempre lo stato nella tabella users per questa email
+            $stmt = $conn->prepare("UPDATE users SET newsletter = 0 WHERE email = ?");
+            $stmt->bind_param("s", $email);
+            $stmt->execute();
+            $stmt->close();
+
+            // Se la sessione appartiene allo stesso utente, aggiorna anche la sessione
+            if (isset($_SESSION['logged_in']) && isset($_SESSION['email']) && $_SESSION['email'] === $email) {
                 $_SESSION['newsletter'] = 0;
             }
         } else {
             $error = 'Errore durante la disiscrizione. Riprova.';
         }
+            } else {
+                $error = 'Link di disiscrizione non valido o scaduto.';
+            }
+        } else {
+            $error = 'Link di disiscrizione non valido.';
+        }
     } else {
-        $error = 'Link di disiscrizione non valido o scaduto.';
+        $error = 'Link di disiscrizione non valido.';
     }
 } else {
     $error = 'Parametri mancanti per la disiscrizione.';
@@ -68,7 +82,7 @@ include_once '../includes/header.php';
                         </p>
                         
                         <div class="mt-4">
-                            <a href="../pages/index.php" class="btn btn-primary">
+                            <a href="../index.php" class="btn btn-primary">
                                 <i class="fas fa-home me-2"></i>Torna alla Home
                             </a>
                             <?php if (isset($_SESSION['logged_in'])): ?>
@@ -86,7 +100,7 @@ include_once '../includes/header.php';
                         </div>
                         
                         <div class="mt-4">
-                            <a href="../pages/index.php" class="btn btn-primary">
+                            <a href="../index.php" class="btn btn-primary">
                                 <i class="fas fa-home me-2"></i>Torna alla Home
                             </a>
                             <a href="newsletter.php" class="btn btn-outline-secondary">
@@ -104,7 +118,7 @@ include_once '../includes/header.php';
                         </div>
                         
                         <div class="mt-4">
-                            <a href="../pages/index.php" class="btn btn-primary">
+                            <a href="../index.php" class="btn btn-primary">
                                 <i class="fas fa-home me-2"></i>Torna alla Home
                             </a>
                         </div>
