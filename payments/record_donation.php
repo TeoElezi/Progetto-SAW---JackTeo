@@ -28,7 +28,6 @@ if ($amount <= 0 || $name === '') {
     exit;
 }
 
-// Try insert with paypal_order_id if column exists; otherwise fallback without it
 $ok = false;
 $stmt = $conn->prepare("INSERT INTO donations (name, amount, created_at, paypal_order_id) VALUES (?, ?, NOW(), ?)");
 if ($stmt) {
@@ -56,5 +55,4 @@ if (!$ok) {
 
 echo json_encode(['success' => true]);
 ?>
-
 

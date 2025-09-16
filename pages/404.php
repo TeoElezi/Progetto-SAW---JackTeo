@@ -1,5 +1,5 @@
 <?php
-include '../includes/header.php'; // Se vuoi mantenere l'header
+include '../includes/header.php';
 ?>
 
 <div class="d-flex flex-column justify-content-center align-items-center text-center" style="min-height: 80vh;">
@@ -11,5 +11,5 @@ include '../includes/header.php'; // Se vuoi mantenere l'header
 </div>
 
 <?php
-include '../includes/footer.php'; // Se usi anche un footer
+include '../includes/footer.php';
 ?>

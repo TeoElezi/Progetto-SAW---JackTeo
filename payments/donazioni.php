@@ -1,7 +1,7 @@
 <?php
 require_once '../config/config.php';
 ?>
-<!-- Navbar -->
+
 <?php include '../includes/header.php' ?>
 
 <div class="container my-5">
@@ -9,30 +9,33 @@ require_once '../config/config.php';
     <div class="col text-center">
       <h1 class="display-4">Supporta F1 FunHub 🚀</h1>
       <p class="lead mt-3">
-        FunHub è una startup nelle sue prime fasi, il tuo sostegno può fare la differenza!  
-        Abbiamo lanciato una campagna di crowdfunding per realizzare nuove funzionalità e una community sempre più grande.  
+        FunHub è una startup nelle sue prime fasi, il tuo sostegno può fare la differenza!
+        Abbiamo lanciato una campagna di crowdfunding per realizzare nuove funzionalità e una community sempre più grande.
       </p>
       <p>
-        Se raggiungeremo l’obiettivo entro la data stabilita, potremo avviare la fase successiva del progetto.  
+        Se raggiungeremo l’obiettivo entro la data stabilita, potremo avviare la fase successiva del progetto.
         Altrimenti, i fondi non verranno utilizzati.
       </p>
     </div>
   </div>
 
   <?php
-  // Parametri della campagna
-  $goal_amount = 10000; // Obiettivo in €
+
+  $goal_amount = 10000;
   $deadline = "2025-12-31 23:59:59";
 
-  // Totale donazioni
-  $res = mysqli_query($conn, "SELECT SUM(amount) as total FROM donations");
-  $row = mysqli_fetch_assoc($res);
+  $row = ['total' => 0];
+  if ($stmt = $conn->prepare("SELECT SUM(amount) as total FROM donations")) {
+    $stmt->execute();
+    $res = $stmt->get_result();
+    $row = $res ? $row = $res->fetch_assoc() : $row;
+    $stmt->close();
+  }
   $total_donations = $row['total'] ?? 0;
 
   $percent = min(100, ($total_donations / $goal_amount) * 100);
   ?>
 
-  <!-- Barra di progresso -->
   <div class="mb-5">
     <h3>Obiettivo: <?php echo $goal_amount; ?> €</h3>
     <div class="progress" style="height: 30px;">
@@ -41,13 +44,12 @@ require_once '../config/config.php';
       </div>
     </div>
     <p class="mt-2">
-      Raccolti: <strong><?php echo $total_donations; ?> €</strong> su <?php echo $goal_amount; ?> €  
+      Raccolti: <strong><?php echo $total_donations; ?> €</strong> su <?php echo $goal_amount; ?> €
       <br>
       Scadenza: <span id="deadline"></span>
     </p>
   </div>
 
-  <!-- Form Donazione -->
 <div class="card shadow-lg p-4 mb-5">
   <h4>Fai una donazione ❤️</h4>
   <form method="POST" action="">
@@ -65,16 +67,20 @@ require_once '../config/config.php';
   </form>
 </div>
 
-  <!-- Lista Donatori -->
   <div>
     <h4>Ultimi sostenitori 🏁</h4>
     <ul class="list-group">
       <?php
-      $donors = mysqli_query($conn, "SELECT name, amount, created_at FROM donations ORDER BY created_at DESC LIMIT 10");
-      while ($donor = mysqli_fetch_assoc($donors)) {
+      $donors = null;
+      if ($stmt = $conn->prepare("SELECT name, amount, created_at FROM donations ORDER BY created_at DESC LIMIT 10")) {
+        $stmt->execute();
+        $donors = $stmt->get_result();
+        $stmt->close();
+      }
+      while ($donors && ($donor = mysqli_fetch_assoc($donors))) {
         echo '<li class="list-group-item d-flex justify-content-between align-items-center">';
         echo htmlspecialchars($donor['name']);
-        echo '<span class="badge bg-danger rounded-pill">+' . $donor['amount'] . ' €</span>';
+        echo '<span class="badge bg-danger rounded-pill">+' . htmlspecialchars((string)$donor['amount']) . ' €</span>';
         echo '</li>';
       }
       ?>
@@ -83,7 +89,7 @@ require_once '../config/config.php';
 </div>
 
 <?php
-// Salvataggio donazione (fallback manuale) con prepared statements
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'], $_POST['amount'])) {
   $name = trim($_POST['name']);
   $amount = (float) $_POST['amount'];
@@ -98,11 +104,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'], $_POST['amoun
 }
 ?>
 
-<!-- Footer -->
 <?php include '../includes/footer.php' ?>
 
 <script>
-  // Countdown alla scadenza
   const deadline = new Date("<?php echo $deadline; ?>").getTime();
   const x = setInterval(() => {
     const now = new Date().getTime();
@@ -120,7 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'], $_POST['amoun
 </script>
 
 <?php if (!empty($paypalClientId)) : ?>
-<!-- PayPal SDK -->
+
 <script src="https://www.paypal.com/sdk/js?client-id=<?php echo urlencode($paypalClientId); ?>&currency=<?php echo urlencode($paypalCurrency ?? 'EUR'); ?>&components=buttons&intent=capture"></script>
 <script>
   const ppNameInput = document.getElementById('name');
@@ -181,5 +185,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'], $_POST['amoun
   }).render('#paypal-button-container');
 </script>
 <?php endif; ?>
-
 

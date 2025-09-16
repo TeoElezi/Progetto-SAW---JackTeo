@@ -1,7 +1,6 @@
 <?php
 require_once '../includes/session.php';
 
-// Check if user is admin
 if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in'] || !($_SESSION['is_admin'] ?? false)) {
     header('Location: ../user/login.php?error=access_denied');
     exit();
@@ -9,30 +8,25 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in'] || !($_SESSION['is
 
 include_once '../includes/header.php';
 
-// Get statistics
 $stats = [];
 
-// Total users
 $stmt = $conn->prepare("SELECT COUNT(*) as total FROM users");
 $stmt->execute();
 $result = $stmt->get_result();
 $stats['users'] = $result->fetch_assoc()['total'];
 $stmt->close();
 
-// Total newsletter subscribers
 $stmt = $conn->prepare("SELECT COUNT(*) as total FROM newsletter_subscribers WHERE status = 'active'");
 $stmt->execute();
 $result = $stmt->get_result();
 $stats['subscribers'] = $result->fetch_assoc()['total'];
 $stmt->close();
 
-// Total posts
-// Rimosso: gestione post non utilizzata
 ?>
 
 <div class="container-fluid mt-4">
     <div class="row">
-        <!-- Sidebar -->
+
         <div class="col-md-3 col-lg-2">
             <div class="card shadow-sm">
                 <div class="card-header bg-dark text-white">
@@ -61,7 +55,6 @@ $stmt->close();
             </div>
         </div>
 
-        <!-- Main Content -->
         <div class="col-md-9 col-lg-10">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2>Dashboard Amministrativa</h2>
@@ -70,7 +63,6 @@ $stmt->close();
                 </div>
             </div>
 
-            <!-- Statistics Cards -->
             <div class="row mb-4">
                 <div class="col-xl-3 col-md-6 mb-4">
                     <div class="card border-left-primary shadow h-100 py-2">
@@ -106,10 +98,8 @@ $stmt->close();
                     </div>
                 </div>
 
-                
             </div>
 
-            <!-- Quick Actions -->
             <div class="row mb-4">
                 <div class="col-12">
                     <div class="card shadow">
@@ -144,7 +134,6 @@ $stmt->close();
                 </div>
             </div>
 
-            
         </div>
     </div>
 </div>
@@ -162,10 +151,10 @@ function showAlert(message, isError = false) {
     const alert = document.getElementById('customAlert');
     const overlay = document.getElementById('overlay');
     const messageDiv = document.getElementById('alertMessage');
-    
+
     messageDiv.innerHTML = message;
     alert.className = 'custom-alert' + (isError ? ' error' : '');
-    
+
     overlay.style.display = 'block';
     alert.style.display = 'block';
 }
@@ -178,7 +167,7 @@ function closeAlert() {
 function fetchNews() {
     // Mostra messaggio di caricamento
     showAlert('Caricamento news in corso...');
-    
+
     // Chiamata AJAX
     fetch('../api/fetch_news.php')
         .then(response => response.text())

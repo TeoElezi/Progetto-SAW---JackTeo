@@ -8,12 +8,10 @@ $success = false;
 $error = '';
 $email = '';
 
-// Verifica parametri
 if (isset($_GET['email']) && isset($_GET['token'])) {
     $email = $_GET['email'];
     $token = $_GET['token'];
 
-    // Decodifica e verifica token HMAC con scadenza
     $decoded = base64_decode($token, true);
     if ($decoded !== false) {
         $parts = explode('|', $decoded);
@@ -22,18 +20,16 @@ if (isset($_GET['email']) && isset($_GET['token'])) {
             $payload = $emailInToken . '|' . $expiresAt;
             $expectedSig = hash_hmac('sha256', $payload, defined('NEWSLETTER_UNSUBSCRIBE_SECRET') ? NEWSLETTER_UNSUBSCRIBE_SECRET : '');
             if (hash_equals($expectedSig, $signature) && hash_equals($emailInToken, $email) && (time() <= (int)$expiresAt)) {
-        // Disiscrivi dalla newsletter
+
         $newsletterManager = new NewsletterManager($conn);
         if ($newsletterManager->removeSubscriber($email)) {
             $success = true;
 
-            // Aggiorna sempre lo stato nella tabella users per questa email
             $stmt = $conn->prepare("UPDATE users SET newsletter = 0 WHERE email = ?");
             $stmt->bind_param("s", $email);
             $stmt->execute();
             $stmt->close();
 
-            // Se la sessione appartiene allo stesso utente, aggiorna anche la sessione
             if (isset($_SESSION['logged_in']) && isset($_SESSION['email']) && $_SESSION['email'] === $email) {
                 $_SESSION['newsletter'] = 0;
             }
@@ -75,12 +71,12 @@ include_once '../includes/header.php';
                                 L'email <strong><?php echo htmlspecialchars($email); ?></strong> è stata rimossa dalla nostra newsletter.
                             </p>
                         </div>
-                        
+
                         <p class="text-muted">
-                            Non riceverai più email dalla nostra newsletter. 
+                            Non riceverai più email dalla nostra newsletter.
                             Se cambierai idea, potrai sempre iscriverti di nuovo dalla tua area personale.
                         </p>
-                        
+
                         <div class="mt-4">
                             <a href="../index.php" class="btn btn-primary">
                                 <i class="fas fa-home me-2"></i>Torna alla Home
@@ -91,14 +87,14 @@ include_once '../includes/header.php';
                                 </a>
                             <?php endif; ?>
                         </div>
-                        
+
                     <?php elseif ($error): ?>
                         <div class="alert alert-danger">
                             <i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i>
                             <h4>Errore</h4>
                             <p class="mb-0"><?php echo htmlspecialchars($error); ?></p>
                         </div>
-                        
+
                         <div class="mt-4">
                             <a href="../index.php" class="btn btn-primary">
                                 <i class="fas fa-home me-2"></i>Torna alla Home
@@ -107,7 +103,7 @@ include_once '../includes/header.php';
                                 <i class="fas fa-envelope me-2"></i>Gestione Newsletter
                             </a>
                         </div>
-                        
+
                     <?php else: ?>
                         <div class="alert alert-info">
                             <i class="fas fa-info-circle fa-3x text-info mb-3"></i>
@@ -116,7 +112,7 @@ include_once '../includes/header.php';
                                 Per disiscriverti dalla newsletter, clicca sul link che hai ricevuto via email.
                             </p>
                         </div>
-                        
+
                         <div class="mt-4">
                             <a href="../index.php" class="btn btn-primary">
                                 <i class="fas fa-home me-2"></i>Torna alla Home

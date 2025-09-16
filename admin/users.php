@@ -2,7 +2,6 @@
 require_once '../includes/session.php';
 require_once '../includes/header.php';
 
-// Check if user is admin
 if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in'] || !($_SESSION['is_admin'] ?? false)) {
     header('Location: ../user/login.php?error=access_denied');
     exit();
@@ -11,23 +10,22 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in'] || !($_SESSION['is
 $action = $_GET['action'] ?? 'list';
 $user_id = $_GET['id'] ?? null;
 
-// Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['csrf_token'])) {
     if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
         $error = 'Token di sicurezza non valido.';
     } else {
         $action_type = $_POST['action_type'] ?? '';
-        
+
         if ($action_type === 'update_status') {
             $user_id = $_POST['user_id'] ?? '';
             $is_admin = $_POST['is_admin'] ?? 0;
             $newsletter = $_POST['newsletter'] ?? 0;
-            
+
             $stmt = $conn->prepare("UPDATE users SET is_admin = ?, newsletter = ? WHERE id = ?");
             $stmt->bind_param("iii", $is_admin, $newsletter, $user_id);
-            
+
             if ($stmt->execute()) {
-                // Mantieni sincronizzata la tabella newsletter_subscribers
+
                 if ((int)$newsletter === 1) {
                     $stmtUserEmail = $conn->prepare("SELECT email FROM users WHERE id = ?");
                     $stmtUserEmail->bind_param("i", $user_id);
@@ -75,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['csrf_token'])) {
             } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email) > 255) {
                 $error = 'Email non valida.';
             } else {
-                // Unique email except current user
+
                 $stmt = $conn->prepare("SELECT id FROM users WHERE email = ? AND id <> ? LIMIT 1");
                 $stmt->bind_param('si', $email, $user_id);
                 $stmt->execute();
@@ -96,15 +94,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['csrf_token'])) {
             }
         } elseif ($action_type === 'delete_user') {
             $user_id_to_delete = $_POST['user_id'] ?? '';
-            
-            // Don't allow admin to delete themselves.
-            // Aggiunto un controllo più robusto per `$_SESSION['user_id']`
+
             if ($user_id_to_delete == ($_SESSION['user_id'] ?? null)) {
                 $error = 'Non puoi eliminare il tuo account.';
             } else {
                 $stmt = $conn->prepare("DELETE FROM users WHERE id = ?");
                 $stmt->bind_param("i", $user_id_to_delete);
-                
+
                 if ($stmt->execute()) {
                     $success = 'Utente eliminato con successo!';
                 } else {
@@ -116,7 +112,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['csrf_token'])) {
     }
 }
 
-// Get user data for editing
 $user = null;
 if ($action === 'edit' && $user_id) {
     $stmt = $conn->prepare("SELECT * FROM users WHERE id = ?");
@@ -125,7 +120,7 @@ if ($action === 'edit' && $user_id) {
     $result = $stmt->get_result();
     $user = $result->fetch_assoc();
     $stmt->close();
-    
+
     if (!$user) {
         header('Location: users.php?error=user_not_found');
         exit();
@@ -144,7 +139,7 @@ if ($action === 'edit' && $user_id) {
                     <a href="index.php" class="list-group-item list-group-item-action">
                         <i class="fas fa-tachometer-alt me-2"></i>Dashboard
                     </a>
-                    
+
                     <a href="users.php" class="list-group-item list-group-item-action active">
                         <i class="fas fa-users me-2"></i>Gestione Utenti
                     </a>
@@ -175,7 +170,7 @@ if ($action === 'edit' && $user_id) {
             <?php if (isset($error)): ?>
                 <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
             <?php endif; ?>
-            
+
             <?php if (isset($success)): ?>
                 <div class="alert alert-success"><?php echo htmlspecialchars($success); ?></div>
             <?php endif; ?>
@@ -204,7 +199,7 @@ if ($action === 'edit' && $user_id) {
                                     $stmt = $conn->prepare("SELECT * FROM users ORDER BY created_at DESC");
                                     $stmt->execute();
                                     $result = $stmt->get_result();
-                                    
+
                                     while ($row = $result->fetch_assoc()):
                                     ?>
                                     <tr>
@@ -231,7 +226,7 @@ if ($action === 'edit' && $user_id) {
                                                 <i class="fas fa-edit"></i>
                                             </a>
                                             <?php if ($row['id'] != ($_SESSION['user_id'] ?? null)): ?>
-                                            <button type="button" class="btn btn-sm btn-outline-danger" 
+                                            <button type="button" class="btn btn-sm btn-outline-danger"
                                                     onclick="deleteUser(<?php echo $row['id']; ?>, '<?php echo htmlspecialchars($row['name'] . ' ' . $row['surname']); ?>')">
                                                 <i class="fas fa-trash"></i>
                                             </button>
@@ -243,7 +238,7 @@ if ($action === 'edit' && $user_id) {
                                     <tr>
                                         <td colspan="7" class="text-center text-muted">Nessun utente trovato</td>
                                     </tr>
-                                    <?php endif; 
+                                    <?php endif;
                                     $stmt->close();
                                     ?>
                                 </tbody>

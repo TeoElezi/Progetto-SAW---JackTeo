@@ -1,0 +1,175 @@
+Project file-by-file documentation
+
+This document describes every folder and file in the repository, organized by folder. For each file it explains its responsibility, noteworthy logic, inputs/outputs, and related database tables or external services.
+
+Root
+- index.php: Homepage controller/view. Renders:
+  - Intro section text.
+  - Latest 5 news from table `news` (prepared SELECT with DESC LIMIT 5). First item is a large card; next four are small cards. If a `link` exists uses external link, otherwise links internally to `pages/news_detail.php` (if implemented later).
+  - Call-to-action donation box linking to `payments/donazioni.php`.
+  - "Prossimo gran premio" box: reads the nearest upcoming race from `races` and renders name, date (formatted), location, and circuit image, plus a countdown container.
+  - Classifiche: two lists with `drivers` and `teams` ordered by points.
+  - Passes the first upcoming race date to JS as `raceDate` and includes `assets/js/countdown.js`.
+  - Dependencies: requires `config/config.php` (creates `$conn`), includes `includes/header.php` and `includes/footer.php`.
+
+- README.md: High-level project overview, setup/replication guide, environment variable list, features and troubleshooting.
+
+- DBTEO.sql: Full database schema and sample content. Includes tables: `users`, `newsletter_subscribers`, `news`, `donations`, `remember_tokens`, `drivers`, `teams`, `races`, `votes`, `app_settings`. Useful both as initial dataset and a reference for expected columns/constraints.
+
+- composer.json / composer.lock: Composer metadata. The project depends on `phpmailer/phpmailer` ^6.10.
+
+- vendor/: Composer-managed dependencies. Do not edit. Contains PHPMailer and Composer autoload.
+
+
+assets/
+- css/style.css: Global styling (brand color, typography, layout, cards, navbar hovers, dropdowns, race box, countdown style). Also includes font-face for Formula 1 Bold. No application logic.
+- fonts/: Custom fonts used by the site (Formula1 family). Asset only.
+- images/: Static images (logo, background, 404 image, avatar). Asset only.
+- js/countdown.js: Client-side countdown for the upcoming race.
+  - Expects a global `raceDate` string (ISO-like format) injected by PHP.
+  - Calculates time difference each second, updates `#countdown` with days/hours/minutes; shows a fallback message if the event has passed; initializes with "Caricamento..." on DOMContentLoaded.
+
+
+config/
+- config.php: Global configuration and DB bootstrap.
+  - getBasePath(): Computes the base path from the parent folder name (useful when deploying in a subdirectory) and returns `/<folder>/`.
+  - appIsProduction(): Reads env `APP_ENV`; controls error reporting (suppressed in production; full in local).
+  - Sets timezone from `APP_TZ` (default Europe/Rome), default charset UTF-8.
+  - PayPal: reads `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`, `PAYPAL_ENV` (sandbox|live), `PAYPAL_CURRENCY` (default EUR) into variables used by payments.
+  - MySQL connection: reads `DB_HOST`, `DB_USERNAME`, `DB_PASSWORD`, `DB_DATABASE`. Connects via mysqli, suppresses mysqli warnings, sets `utf8mb4` charset. On failure: logs and sends HTTP 500 with a generic message.
+  - Exports `$conn` (mysqli instance) globally for includes to use.
+
+- email_config.php: Newsletter/SMTP configuration via constants.
+  - Defines sender email/name, SMTP host/port/username/password/security, subject prefix, reply-to.
+  - Defines unsubscribe HMAC secret and expiry days.
+  - Provides helper getters: `getNewsletterConfig()`, `validateEmailConfig()`, `getDebugSettings()`.
+  - Used by `includes/NewsletterManager.php` to configure PHPMailer.
+
+
+includes/
+- header.php: Layout header and top navbar/banner.
+  - Requires `config/config.php`, `session.php`, `auto_fetch_news.php`.
+  - Sends basic security headers if not already sent.
+  - HTML: links Bootstrap CSS and Font Awesome from CDNs, site stylesheet, and favicon.
+  - Navbar with links to pages, search form (GET to `pages/search.php`), and auth area (login link or user dropdown with profile and admin link if `$_SESSION['is_admin']`).
+  - Live updates banner: queries next race (`name`, `date`, `location`) for a one-line info strip.
+
+- footer.php: Footer layout.
+  - Links to primary sections (news, races, drivers, teams, standings) and shows site notices.
+  - Includes Bootstrap JS bundle from CDN.
+
+- session.php: Session/cookie/CSRF/remember-me and rate-limits.
+  - Cookie params: SameSite=Lax, Secure when HTTPS, HttpOnly.
+  - Starts session if not started; tracks `last_activity` and logs out after 30 days inactivity for logged users (destroys session and redirects to login with timeout error).
+  - Creates a per-session CSRF token.
+  - Rate-limit storage arrays in `$_SESSION` (e.g., `login_rate_limit`, `register_rate_limit`).
+  - Remember-me helpers:
+    - generate_remember_token(): random token.
+    - create_remember_cookie(user_id, email): stores token in DB table `remember_tokens` with expiry; sets cookie `remember_token` with `user_id:token` value.
+    - validate_remember_cookie(): if cookie present and valid in DB, rotates token and re-authenticates the session (sets `$_SESSION` user fields and `is_admin`).
+    - clear_remember_cookie(user_id?): removes token from DB and clears cookie.
+  - On boot, if no active session, attempts `validate_remember_cookie()` to auto-login.
+
+- auto_fetch_news.php: Opportunistic news fetch trigger.
+  - Reads `app_settings.news_last_fetch` timestamp; if more than 3600 sec passed, updates the timestamp and triggers a non-blocking HTTP GET to `api/fetch_news.php` on the same host (using fsockopen, async).
+  - Lets normal page render continue without waiting for the API.
+
+- NewsletterManager.php: Newsletter sending service using PHPMailer.
+  - Loads `config/email_config.php` and Composer autoload; reads SMTP settings via `getNewsletterConfig()`.
+  - Public API:
+    - sendNewsletterWithNews($news_ids, $subject, $custom_message=''): Fetches selected news, loads active subscribers, loops and sends styled HTML emails (embeds logo as CID if present or uses URL), tracks per-subscriber success/fail and updates `last_sent_at`.
+    - getNewsletterStats(): Returns counts of active/total subscribers and users with newsletter flag.
+    - addSubscriber($email): Upsert into `newsletter_subscribers` setting status active.
+    - removeSubscriber($email): Sets status to unsubscribed and timestamps.
+  - Internals:
+    - getNewsItemsByIds(): Prepared IN clause with dynamic placeholders.
+    - getActiveSubscribers(): Fetches active subscribers.
+    - sendEmailToSubscriberWithNews(): Configures PHPMailer (TLS/SSL based on config), builds HTML/Alt bodies, and sends.
+    - buildEmailMessageWithNews(): Generates inline-styled HTML summary of selected news with CTA links, unsubscribe link.
+    - generateUnsubscribeLink(email): Builds time-limited signed URL using HMAC secret; points to `user/unsubscribe.php` with `email` and `token`.
+
+
+api/
+- fetch_news.php: Fetch/import F1 news from RapidAPI.
+  - Requires `config/config.php`; sets time limit 60s.
+  - Calls `https://f1-motorsport-data.p.rapidapi.com/news` with headers `x-rapidapi-host` and `x-rapidapi-key` (currently read from a local variable—replace with env var for production).
+  - Validates HTTP/JSON, iterates items, extracts `headline`, `description`, `link`, first image fields, and `dataSourceIdentifier` as idempotency key.
+  - Uses prepared statements to check existence by `data_source_id`; inserts missing rows into `news` in a transaction; outputs count of inserted items.
+  - Tables: `news`.
+
+
+pages/
+- 404.php: Not-found page view.
+- drivers.php: Lists `drivers` ordered by points; likely renders team and nationality details.
+- races.php: Calendar of `races` (date, location, circuit image) and possibly past winners.
+- registration.php: Registration form view; posts to `user/registrationProcess.php` with CSRF token.
+- search.php: Search UI for news/drivers/teams; performs parameterized queries.
+
+
+payments/
+- donazioni.php: Donation page with crowdfunding-like progress.
+  - Calculates `goal_amount` and `deadline`, aggregates `donations` sum for progress bar, lists latest donors.
+  - Provides a simple POST fallback form to insert name/amount directly into `donations` (server-side insert, then reloads the page).
+  - If `PAYPAL_CLIENT_ID` is set, renders PayPal JS SDK button:
+    - Validates inputs before enabling.
+    - createOrder: sets currency and value based on inputs.
+    - onApprove: captures on PayPal and POSTs JSON to `payments/verify_and_record.php` for server-side verification and idempotent insert by `paypal_order_id`.
+  - Depends on `$paypalClientId`, `$paypalCurrency` from `config/config.php` and layout includes.
+  - Tables: `donations`.
+
+- verify_and_record.php: Server-side PayPal verify + record endpoint.
+  - JSON POST: { name, amount, orderId }.
+  - Obtains OAuth2 token from PayPal using `PAYPAL_CLIENT_ID`/`PAYPAL_CLIENT_SECRET` and selected environment (sandbox/live), then fetches order details and compares statuses and amounts (if provided).
+  - Inserts donation row with `paypal_order_id` using INSERT IGNORE to ensure idempotency; logs to `paypal_errors.log` upon errors.
+
+- record_donation.php: Alternate JSON insert endpoint.
+  - Accepts { name, amount, orderId? } and inserts into `donations`. If the first insert fails (e.g., unique constraint on `paypal_order_id`), attempts a second insert without orderId.
+
+
+admin/
+- index.php: Admin landing page; links to user management, newsletter, donations, subscribers.
+- users.php: Lists users; may allow toggling `is_admin`, `newsletter` flags and basic management.
+- newsletter.php: Admin interface to select news IDs, compose subject/message, and trigger send via `NewsletterManager`.
+- subscribers.php: Lists newsletter subscribers with actions to deactivate/reactivate.
+- donations.php: Lists and filters donations for moderation/accounting.
+- create_admin_user.php: Utility to create an admin account locally (guarded by host check in typical setups). Uses prepared insert with a hashed password.
+
+
+user/
+- registration.php: Registration form view; includes CSRF token and newsletter opt-in checkbox.
+- registrationProcess.php: Handles registration POST.
+  - Validates CSRF (matches `$_SESSION['csrf_token']`).
+  - Rate limits by client IP (session window 15 minutes, max 5 attempts).
+  - Validates fields: name/surname (letters only with accents), email format/length, password match, simple strength; checks email uniqueness.
+  - If `users.username` exists, derives username from email prefix; otherwise inserts without username field.
+  - Hashes password with `password_hash`, inserts user. If newsletter opted-in, upserts into `newsletter_subscribers` via `NewsletterManager::addSubscriber()`.
+  - Initializes session (`logged_in`, user fields) and redirects to homepage with success.
+
+- login.php: Login form view; includes CSRF token, remember-me checkbox.
+- loginProcess.php: Handles login POST.
+  - Validates CSRF and rate-limits per IP.
+  - Fetches user by email, verifies with `password_verify`. Performs a dummy `password_verify` on a hash in the failure branch to mitigate timing differences.
+  - On success: regenerates session ID, sets user session fields, sets `is_admin`, and if remember-me requested, calls `create_remember_cookie()`.
+  - On failure: increments rate-limit bucket and redirects with error.
+
+- logout.php: Clears session and remember cookie; redirects to login or home.
+- newsletter.php: End-user newsletter page (subscribe/unsubscribe flows and status display).
+- profilePage.php / profilePageProcess.php: Profile view/edit for authenticated user (name/surname/newsletter flag, etc.).
+- unsubscribe.php: Handles signed unsubscribe links from emails; verifies token/expiry and updates `newsletter_subscribers`.
+
+
+api/ (archive)/
+- archive/api/scraping.php: Legacy or experimental script for scraping older news sources; not used in main flow.
+- archive/api/update_calendar.php: Legacy script to update `races` table; replaced by DB import or admin.
+
+assets (archive)
+- archive/assets/fonts: Older font assets retained for reference; not actively used by the current stylesheet.
+
+
+Other notes
+- Global DB access: Most scripts require `config/config.php` which provides `$conn` (mysqli). Always use prepared statements for dynamic input.
+- Paths and base URL: Use `getBasePath()` to build links and asset URLs consistently across subdirectory deployments.
+- Security headers: Sent in `includes/header.php` before HTML output when possible.
+- Error handling: User-facing pages return friendly messages; detailed errors are logged via `error_log` (DB) or to local files (PayPal verify).
+
+

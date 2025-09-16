@@ -1,5 +1,5 @@
 <?php
-// Funzione per recuperare i dati delle gare dal database
+
 function getRaces($conn) {
     $sql = "SELECT id, name, date, location, circuit_img FROM races ORDER BY date ASC";
     return $conn->query($sql);
@@ -7,7 +7,6 @@ function getRaces($conn) {
 
 include '../includes/header.php';
 
-// Recupera gare e separa prossime e passate
 $racesResult = getRaces($conn);
 $races = [];
 if ($racesResult && $racesResult->num_rows > 0) {

@@ -1,5 +1,5 @@
 <?php
-    include '../includes/header.php'; // Inclusione dell'header
+    include '../includes/header.php';
 
     if (isset($_GET['q'])) {
         $search = trim($_GET['q']);
@@ -8,20 +8,16 @@
         $perPage = 10;
         $offset = ($page - 1) * $perPage;
 
-        // Count total
         $stmtCount = $conn->prepare("SELECT COUNT(*) as total FROM news WHERE title LIKE CONCAT('%', ?, '%') OR content LIKE CONCAT('%', ?, '%')");
         $stmtCount->bind_param('ss', $search, $search);
         $stmtCount->execute();
         $total = $stmtCount->get_result()->fetch_assoc()['total'] ?? 0;
         $stmtCount->close();
 
-        // Fetch page
         $stmt = $conn->prepare("SELECT * FROM news WHERE title LIKE CONCAT('%', ?, '%') OR content LIKE CONCAT('%', ?, '%') ORDER BY posted_at DESC LIMIT ? OFFSET ?");
         $stmt->bind_param('ssii', $search, $search, $perPage, $offset);
         $stmt->execute();
         $result = $stmt->get_result();
-
-        
 
         echo "<h2>Risultati per: <em>" . htmlspecialchars($search) . "</em></h2>";
 
@@ -42,7 +38,7 @@
                 echo '</div>';
             }
             echo '</div>';
-            // Pagination
+
             $totalPages = (int)ceil($total / $perPage);
             if ($totalPages > 1) {
                 echo '<nav aria-label="Risultati">';
@@ -67,5 +63,5 @@
         }
         $stmt->close();
     }
-include '../includes/footer.php'; // Inclusione del footer
+include '../includes/footer.php';
 ?>

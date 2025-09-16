@@ -7,10 +7,8 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
 }
 ?>
 
-<!-- Navbar -->
 <?php include '../includes/header.php' ?>
 
-<!-- Contenuto principale -->
 <div class="container my-5">
   <div class="row justify-content-center">
     <div class="col-lg-8">
@@ -21,7 +19,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
           </h2>
         </div>
         <div class="card-body p-4">
-          
+
           <div class="row">
             <div class="col-md-6 mb-4">
               <div class="profile-info-card h-100">
@@ -36,7 +34,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
                 </div>
               </div>
             </div>
-            
+
             <div class="col-md-6 mb-4">
               <div class="profile-stats-card h-100 text-center">
                 <h6 class="text-muted mb-2">Stato Account</h6>
@@ -54,7 +52,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
 
           <div class="profile-details">
             <h4 class="mb-4 text-center">Informazioni Personali</h4>
-            
+
             <div class="row g-3">
               <div class="col-md-6">
                 <div class="info-item">
@@ -67,7 +65,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
                   </div>
                 </div>
               </div>
-              
+
               <div class="col-md-6">
                 <div class="info-item">
                   <label class="form-label fw-bold text-muted">Cognome</label>
@@ -79,7 +77,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
                   </div>
                 </div>
               </div>
-              
+
               <div class="col-md-6">
                 <div class="info-item">
                   <label class="form-label fw-bold text-muted">Email</label>
@@ -91,7 +89,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
                   </div>
                 </div>
               </div>
-              
+
               <div class="col-md-6">
                 <div class="info-item">
                   <label class="form-label fw-bold text-muted">Newsletter</label>
@@ -129,7 +127,6 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
   </div>
 </div>
 
-<!-- Modale eliminazione account -->
 <div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -166,10 +163,9 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
       </form>
     </div>
   </div>
-  
+
 </div>
 
-<!-- Modale per modifica del nome -->
 <div class="modal fade" id="modificaNomeModal" tabindex="-1" aria-labelledby="modificaNomeLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -200,7 +196,6 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
   </div>
 </div>
 
-<!-- Modale per modifica del cognome -->
 <div class="modal fade" id="modificaCognomeModal" tabindex="-1" aria-labelledby="modificaCognomeLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -231,7 +226,6 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
   </div>
 </div>
 
-<!-- Modale per modifica dell'email -->
 <div class="modal fade" id="modificaEmailModal" tabindex="-1" aria-labelledby="modificaEmailLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -262,7 +256,6 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
   </div>
 </div>
 
-<!-- Modale per modifica della newsletter -->
 <div class="modal fade" id="modificaNewsletterModal" tabindex="-1" aria-labelledby="modificaNewsletterLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -296,10 +289,8 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
   </div>
 </div>
 
-<!-- Footer -->
 <?php include '../includes/footer.php' ?>
 
-<!-- Font Awesome per le icone -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <style>

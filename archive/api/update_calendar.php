@@ -1,7 +1,6 @@
 <?php
 require_once __DIR__ . '/../config/config.php';
 
-// Chiamata all'API per ottenere i dati delle gare
 $curl = curl_init();
 
 curl_setopt_array($curl, [
@@ -26,10 +25,9 @@ curl_close($curl);
 if ($err) {
     echo "cURL Error #:" . $err;
 } else {
-    // Decodifica la risposta JSON
+
     $data = json_decode($response, true);
 
-    // Itera sulle date e inserisci i dati nel database
     foreach ($data as $dateKey => $races) {
         foreach ($races as $race) {
             $name = $race['gPrx'] ?? null;
@@ -37,7 +35,6 @@ if ($err) {
             $location = $race['crct'] ?? null;
             $circuit_img = $race['evLink'] ?? null;
 
-            // winner_id non disponibile: settiamo NULL
             $winner_id = null;
 
             $stmt = $conn->prepare("INSERT INTO races (name, date, location, circuit_img, winner_id) VALUES (?, ?, ?, ?, ?)");
@@ -52,5 +49,4 @@ if ($err) {
     }
 }
 
-// Chiudi la connessione al database
 $conn->close();

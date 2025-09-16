@@ -3,7 +3,6 @@ require_once __DIR__ . '/../config/config.php';
 
 header('Content-Type: application/json');
 
-// Basic error logging to help diagnose failures (log file under payments/)
 function log_pp($msg) {
     $logfile = __DIR__ . '/paypal_errors.log';
     @file_put_contents($logfile, '[' . date('c') . "] " . $msg . "\n", FILE_APPEND);
@@ -36,7 +35,6 @@ if ($paypalClientId === '' || $paypalClientSecret === '') {
 
 $base = $paypalEnvironment === 'live' ? 'https://api-m.paypal.com' : 'https://api-m.sandbox.paypal.com';
 
-// Get access token
 $ch = curl_init("$base/v1/oauth2/token");
 curl_setopt_array($ch, [
     CURLOPT_POST => true,
@@ -68,7 +66,6 @@ if (!$token) {
     exit;
 }
 
-// Fetch order details to verify status/amount
 $ch = curl_init("$base/v2/checkout/orders/" . urlencode($orderId));
 curl_setopt_array($ch, [
     CURLOPT_HTTPGET => true,
@@ -107,7 +104,6 @@ if ($amountClient !== null && $amountServer !== null && $amountClient !== $amoun
     exit;
 }
 
-// Idempotent insert: ignore duplicate order ids
 $ok = false;
 $stmt = $conn->prepare("INSERT IGNORE INTO donations (name, amount, created_at, paypal_order_id) VALUES (?, ?, NOW(), ?)");
 if ($stmt) {
@@ -131,5 +127,4 @@ if (!$ok) {
 
 echo json_encode(['success' => true]);
 ?>
-
 

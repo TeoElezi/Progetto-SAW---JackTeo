@@ -1,7 +1,6 @@
 <?php
 require_once '../includes/session.php';
 
-// Admin check
 if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in'] || !($_SESSION['is_admin'] ?? false)) {
     header('Location: ../user/login.php?error=access_denied');
     exit();
@@ -9,7 +8,6 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in'] || !($_SESSION['is
 
 require_once '../config/config.php';
 
-// Filters
 $orderId = isset($_GET['order']) ? trim($_GET['order']) : '';
 $from = isset($_GET['from']) ? trim($_GET['from']) : '';
 $to = isset($_GET['to']) ? trim($_GET['to']) : '';
@@ -90,5 +88,4 @@ include_once '../includes/header.php';
 </div>
 
 <?php include_once '../includes/footer.php'; ?>
-
 

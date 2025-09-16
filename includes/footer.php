@@ -1,12 +1,11 @@
 
-    </div> <!-- End of container -->
-</main> <!-- chiusura container -->
+    </div>
+</main>
 
-<!-- Footer -->
 <footer class="bg-dark text-center text-light pt-5 pb-3">
     <div class="container">
         <div class="row">
-            <!-- Sezione Link Footer -->
+
             <div class="col-md-6 mb-3">
                 <h5 class="text-danger">F1 FanHub</h5>
                 <ul class="list-unstyled">
@@ -18,7 +17,6 @@
                 </ul>
             </div>
 
-            <!-- Sezione Credits -->
             <div class="col-md-6 mb-3 d-flex flex-column justify-content-center">
                 <p class="small mb-1">© 2025 F1 FanHub</p>
                 <p class="small mb-1">Non affiliato ufficialmente alla Formula 1. Sito creato a scopo educativo.</p>
@@ -33,12 +31,7 @@
     </div>
 </footer>
 
-<!-- Bootstrap Bundle JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-
-<!-- Custom JS -->
-<!-- <script src="../assets/js/main.js"></script> -->
 
 </body>
 </html>
